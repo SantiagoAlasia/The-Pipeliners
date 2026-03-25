@@ -49,4 +49,22 @@ Por lo tanto, los benchmarks que mejor representan este tipo de uso son aquellos
 - **TensorFlow Lite / oneDNN**  
   Utilizados para tareas de inteligencia artificial en CPU.
 
+### 1.4 Tabla: tareas diarias y benchmark asociado
+
+| Tarea diaria | Benchmark representativo | Justificación |
+|---|---|---|
+| Compilar programas en C/C++ | Build Linux Kernel | Representa una tarea real de compilación intensiva |
+| Compilar proyectos grandes | Build GCC / LLVM | Simula compilaciones complejas |
+| Trabajar con repositorios | Git Benchmark | Representa operaciones reales sobre archivos |
+| Comprimir archivos | gzip / zstd / xz | Refleja tareas comunes del sistema |
+| Procesar videos | FFmpeg / x264 | Simula carga multimedia |
+| Renderizar gráficos | Blender | Representa renderizado 3D |
+| Trabajar con bases de datos | pgbench / SQLite | Simula consultas y manejo de datos |
+| Ejecutar modelos de IA | TensorFlow Lite | Representa procesamiento intensivo en CPU |
+
+### 1.5 Conclusión
+
+Los benchmarks son herramientas fundamentales para evaluar el rendimiento de un sistema, pero su utilidad depende del contexto. No existe una única prueba que represente todos los usos posibles.
+Para obtener resultados significativos, es importante elegir benchmarks que reflejen las tareas reales del usuario. En este caso, para un perfil orientado a la programación, los benchmarks de compilación resultan especialmente representativos.
+
 

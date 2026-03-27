@@ -1,9 +1,10 @@
 # Trabajo Práctico 1 - Rendimiento de las Computadoras
 
 ## Integrantes
-- Elena Monutti
+
 - Santiago Alasia
 - Lucia Feiguin
+- Elena Monutti
 
 ## Objetivo
 
@@ -121,3 +122,60 @@ Sin embargo, la aceleración no es proporcional a la cantidad de núcleos, lo cu
 - Partes del código que no pueden paralelizarse
 - Diferencias en arquitectura
 Esto coincide con el concepto de que no todo el programa puede ejecutarse en paralelo de manera perfecta.
+
+## 3. Time Profiling
+
+### 3.1 Objetivo
+
+En esta sección se analiza el rendimiento de un programa propio utilizando herramientas de time profiling. A diferencia de los benchmarks, que miden el rendimiento global del sistema, el profiling permite observar cuánto tiempo consume cada función dentro de un programa.
+
+Esto permite identificar posibles cuellos de botella y entender mejor cómo se distribuye el tiempo de ejecución.
+
+### 3.2 Resultados del Profiling
+
+Se utilizó la herramienta gprof para analizar el tiempo de ejecución del programa. A partir del archivo generado (`analysis.txt`), se obtuvo el perfil plano (flat profile), que muestra cómo se distribuye el tiempo entre las distintas funciones. El mismo se encuentra a continuación.
+
+```
+   %   cumulative   self              self     total           
+  time   seconds   seconds    calls   s/call   s/call  name    
+ 51.07      4.52     4.52        1     4.52     4.82  func1
+ 42.71      8.30     3.78        1     3.78     3.78  func2
+  3.39      8.60     0.30        1     0.30     0.30  new_func1
+  2.82      8.85     0.25                             main
+```
+
+Los resultados indican que la función `func1` consume el mayor porcentaje del tiempo de ejecución, aproximadamente un 51.07% del total. En segundo lugar se encuentra `func2`, con un 42.71%, mientras que `new_func1` y main` representan una porción mucho menor del tiempo total.
+
+Todas las funciones fueron ejecutadas una punica vez, lo cual se observa en la columna calls. La diferencia en los tiempos se debe principalmente a la cantidad de iteraciones de los bucles presentes en cada función. En particular, `func1` no solo realiza un bucle de gran tamaño, sino que además invoca a `new_func1`, lo que incrementa su tiempo total de ejecución.
+
+### 3.3 Análisis del gráfico de llamadas
+
+Se obtuvo el siguiente call graph:
+
+```
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]    100.0    0.25    8.60                 main [1]
+                4.52    0.30       1/1           func1 [2]
+                3.78    0.00       1/1           func2 [3]
+-----------------------------------------------
+                4.52    0.30       1/1           main [1]
+[2]     54.5    4.52    0.30       1         func1 [2]
+                0.30    0.00       1/1           new_func1 [4]
+-----------------------------------------------
+                3.78    0.00       1/1           main [1]
+[3]     42.7    3.78    0.00       1         func2 [3]
+-----------------------------------------------
+                0.30    0.00       1/1           func1 [2]
+[4]      3.4    0.30    0.00       1         new_func1 [4]
+```
+
+El gráfico de llamadas (call graph) permite observar la relación entre las funciones. En este caso, la función `main` es la encargada de invocar a `func1`y `func2`, mientras que `func1`a su vez llama a `new_func1`.
+
+Este comportamiento explica la propagación del tiempo de ejecución, ya que parte del tiempo de `func1` incluye el tiempo consumido por `new_func1`. Esto se refleja en la columna children del análisis.
+
+### 3.4 Conclusión del profiling
+
+A partir del análisis realizado, se concluye que la función `func1` constituye el principal cuello de botella del programa. Esto coincide con la estructura del código, ya que contiene el bucle más costoso y además invoca a otra función. 
+
+El uso de herramientas de profiling como gprof permite identificar con precisión qué partes del código consumen más tiempo, lo cual es fundamental para optimizar programas y mejorar su rendimiento.

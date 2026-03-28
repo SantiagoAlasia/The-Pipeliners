@@ -196,11 +196,11 @@ Una vez cargado el programa (ubicado en el directorio `The-Pipeliners/TP1/ESP826
 
 En la primera prueba, el microcontrolador opera a una frecuencia de **80 MHz**. En estas condiciones, el tiempo de ejecución del programa es de aproximadamente 10,5 segundos, como se muestra en la siguiente imagen:
 
-![alt text](/img/image-1.png)
+![Resultados con Frec CPU = 80MHz](img/image-1.png)
 
 A continuación, se procede a duplicar la **frecuencia del procesador** a **160 MHz** y se repite la ejecución del mismo programa.
 
-![alt text](/img/image-2.png)
+![Resultados con Frec CPU = 160MHz](img/image-2.png)
 
 Como se puede observar, el tiempo de ejecución se reduce aproximadamente a la mitad. Este comportamiento indica una **mejora en el rendimiento del sistema** al aumentar la **frecuencia del clock del procesador**.
 

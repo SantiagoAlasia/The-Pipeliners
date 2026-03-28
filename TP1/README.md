@@ -179,3 +179,43 @@ Este comportamiento explica la propagación del tiempo de ejecución, ya que par
 A partir del análisis realizado, se concluye que la función `func1` constituye el principal cuello de botella del programa. Esto coincide con la estructura del código, ya que contiene el bucle más costoso y además invoca a otra función. 
 
 El uso de herramientas de profiling como gprof permite identificar con precisión qué partes del código consumen más tiempo, lo cual es fundamental para optimizar programas y mejorar su rendimiento.
+
+## 4. Ejercicio Con ESP8266
+
+### 4.1 Objetivo
+
+En esta sección se busca poner en práctica los conocimientos teóricos utilizando el microcontrolador **ESP8266**. El objetivo del ejercicio consiste en ejecutar un programa que realiza operaciones simples (sumas de números enteros y de punto flotante) durante un tiempo aproximado de 10 segundos a una determinada frecuencia de reloj del procesador.
+
+Posteriormente, se analiza cómo afecta la variación de la **frecuencia del CPU** (duplicar) sobre el tiempo de ejecución del programa.
+
+Para el desarrollo del ejercicio se utilizó el entorno de desarrollo Arduino IDE, debido a su compatibilidad con el ESP8266 y la facilidad que brinda para la carga y ejecución de programas en este tipo de dispositivos.
+
+### 4.2 Resultados
+
+Una vez cargado el programa (ubicado en el directorio `The-Pipeliners/TP1/ESP8266/main`), se pueden observar el siguiente resultado a través del monitor serial.
+
+En la primera prueba, el microcontrolador opera a una frecuencia de **80 MHz**. En estas condiciones, el tiempo de ejecución del programa es de aproximadamente 10,5 segundos, como se muestra en la siguiente imagen:
+
+![alt text](/img/image-1.png)
+
+A continuación, se procede a duplicar la **frecuencia del procesador** a **160 MHz** y se repite la ejecución del mismo programa.
+
+![alt text](/img/image-2.png)
+
+Como se puede observar, el tiempo de ejecución se reduce aproximadamente a la mitad. Este comportamiento indica una **mejora en el rendimiento del sistema** al aumentar la **frecuencia del clock del procesador**.
+
+### 4.3 Análisis
+
+El resultado obtenido es consistente con el modelo teórico, donde el tiempo de ejecución de un programa puede expresarse como:
+
+Al duplicar la frecuencia del procesador, se incrementa la cantidad de instrucciones que pueden ejecutarse por unidad de tiempo, lo que produce una disminución proporcional en el tiempo total de ejecución.
+
+Cabe destacar que la reducción no es exactamente del 50%.
+
+### 4.4 Conclusión
+
+A partir del experimento realizado, se concluye que existe una relación inversamente proporcional entre la **frecuencia del procesador** y el **tiempo de ejecución de un programa**.
+
+El aumento de la **frecuencia de clock** permite mejorar el **rendimiento del sistema**, reduciendo el tiempo necesario para completar una misma tarea. Sin embargo, en sistemas reales, esta relación puede no ser perfectamente lineal debido a distintos factores internos del hardware y del entorno de ejecución.
+
+Este ejercicio permitió verificar experimentalmente los conceptos teóricos vinculados al **rendimiento** de los procesadores y la influencia de la frecuencia de operación sobre el **tiempo de ejecución**.

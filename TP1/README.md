@@ -208,6 +208,8 @@ Como se puede observar, el tiempo de ejecución se reduce aproximadamente a la m
 
 El resultado obtenido es consistente con el modelo teórico, donde el tiempo de ejecución de un programa puede expresarse como:
 
+$$ Tiempo_{Prog} =  N° instrucciones * CPI * Tiempo_{CPU}$$
+
 Al duplicar la frecuencia del procesador, se incrementa la cantidad de instrucciones que pueden ejecutarse por unidad de tiempo, lo que produce una disminución proporcional en el tiempo total de ejecución.
 
 Cabe destacar que la reducción no es exactamente del 50%.

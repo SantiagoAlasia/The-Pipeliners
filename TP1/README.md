@@ -214,7 +214,23 @@ Al duplicar la frecuencia del procesador, se incrementa la cantidad de instrucci
 
 Cabe destacar que la reducción no es exactamente del 50%.
 
-### 4.4 Conclusión
+### 4.4 Análisis adicional: operaciones con enteros vs punto flotante
+
+Con el fin de profundizar mas en el analisis de rendimineto del microcontrolador, se analiso como afecta en el tiempo de programa realizar operaciones con punto flotantes en este tipo de microcontrolador que no posee una uniodad de putno flotante.
+
+El programa utilizado ejecuta dos bucles: uno realizando sumas con enteros y otro con números de punto flotante, midiendo el tiempo total de ejecución en ambos casos.
+
+*Resultados observados*
+
+Se pudo verificar que las operaciones con variables de tipo float presentan un tiempo de ejecución mayor en comparación con las operaciones con enteros.
+
+Esto se debe a que el ESP8266 no dispone de una Unidad de Punto Flotante (FPU) en hardware. Por lo tanto, todas las operaciones de punto flotante son realizadas por software mediante rutinas adicionales, lo que introduce una sobrecarga significativa en la ejecución.
+
+En contraste, las operaciones con enteros son soportadas directamente por la ALU del procesador, lo que permite ejecutarlas en menos ciclos de reloj.
+
+Por lo tanto, el tiempo de ejecución de programas que utilizan float es considerablemente mayor.
+
+### 4.5 Conclusión
 
 A partir del experimento realizado, se concluye que existe una relación inversamente proporcional entre la **frecuencia del procesador** y el **tiempo de ejecución de un programa**.
 
@@ -222,8 +238,22 @@ El aumento de la **frecuencia de clock** permite mejorar el **rendimiento del si
 
 Este ejercicio permitió verificar experimentalmente los conceptos teóricos vinculados al **rendimiento** de los procesadores y la influencia de la frecuencia de operación sobre el **tiempo de ejecución**.
 
+Asimismo, se comprobó que el uso de variables de tipo float en el ESP8266 introduce una penalización en el tiempo de ejecución. Esto se debe a la ausencia de una **Unidad de Punto Flotante (FPU)**, lo que obliga al procesador a realizar estas operaciones mediante software, incrementando la cantidad de instrucciones necesarias.
+
+En conjunto, los resultados obtenidos permiten validar experimentalmente los conceptos teóricos relacionados con el rendimiento de los procesadores y ponen en evidencia la importancia de considerar las características de la arquitectura al momento de diseñar software, especialmente en el contexto de sistemas embebidos.
+
 ---
 
 ## Conclusión general
 
-A lo largo de este trabajo se pudo observar cómo diferentes herramientas y metodologías permiten analizar el rendimiento de sistemas computacionales desde distintas perspectivas. En primer lugar, los benchmarks demostraron que la evaluación del desempeño depende del tipo de tareas que realiza el usuario; no existe una prueba única que refleje todos los usos posibles, y para perfiles orientados a la programación, los tests de compilación resultan especialmente representativos. Por otra parte, la comparación de procesadores al compilar el kernel de Linux evidenció que el rendimiento no solo depende de la cantidad de núcleos, sino también de la arquitectura y optimización de cada CPU, reflejándose en diferencias de tiempo de compilación y aceleración significativa en modelos más potentes. El análisis mediante profiling permitió identificar cuellos de botella dentro de un programa, destacando la importancia de medir el tiempo de ejecución de cada función para optimizar el código. Finalmente, el ejercicio con el ESP8266 confirmó experimentalmente que el tiempo de ejecución de un programa disminuye al aumentar la frecuencia del procesador, mostrando una relación inversamente proporcional entre frecuencia y duración de la tarea. En conjunto, estas experiencias evidencian que el rendimiento de un sistema es multidimensional y que su análisis requiere tanto herramientas globales como detalladas para comprender y optimizar eficazmente la performance.
+A lo largo de este trabajo se pudo observar cómo diferentes herramientas y metodologías permiten analizar el rendimiento de sistemas computacionales desde distintas perspectivas. 
+
+En primer lugar, los benchmarks demostraron que la evaluación del desempeño depende del tipo de tareas que realiza el usuario; no existe una prueba única que refleje todos los usos posibles, y para perfiles orientados a la programación, los tests de compilación resultan especialmente representativos.
+
+Por otra parte, la comparación de procesadores al compilar el kernel de Linux evidenció que el rendimiento no solo depende de la cantidad de núcleos, sino también de la arquitectura y optimización de cada CPU, reflejándose en diferencias de tiempo de compilación y aceleración significativa en modelos más potentes. 
+
+El análisis mediante profiling permitió identificar cuellos de botella dentro de un programa, destacando la importancia de medir el tiempo de ejecución de cada función para optimizar el código. 
+
+Finalmente, el ejercicio con el ESP8266 confirmó experimentalmente que el tiempo de ejecución de un programa disminuye al aumentar la frecuencia del procesador, mostrando una relación inversamente proporcional entre frecuencia y duración de la tarea. 
+
+En conjunto, estas experiencias evidencian que el rendimiento de un sistema es multidimensional y que su análisis requiere tanto herramientas globales como detalladas para comprender y optimizar eficazmente la performance.

@@ -27,12 +27,13 @@ void testLoop() {
   
   unsigned long start = micros();
 
+  // Operaciones con enteros
   for(i = 0; i <= 500000; i++){
     sumaEntera++;
     yield();
   }
 
-  
+  // Operaciones con flotantes  
   for(i = 0; i <= 1000000; i++){
     sumaFloat = sumaFloat + 1.2;
     yield();

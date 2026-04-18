@@ -1,12 +1,17 @@
 # Instructivo para ejecutar el programa
 
-## Ejecucion manual
+## Ejecucion manual (v2: Python + C + ASM)
 ```
     cd c
 
+    # Compilar ASM
+    nasm -f elf64 gini_asm.s -o gini_asm.o
+
+    # Compilar C
     gcc -c -fPIC gini.c -o gini.o
 
-    gcc -shared -w -o libgini.so gini.o
+    # Crear librería compartida
+    gcc -shared -o libgini.so gini.o gini_asm.o
 
     cd ../src
 

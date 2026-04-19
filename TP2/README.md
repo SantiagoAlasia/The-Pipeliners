@@ -51,3 +51,9 @@ Además, se incorporó Docker para estandarizar el entorno de ejecución y simpl
 ---
 
 ## Conclusión general
+
+El desarrollo del trabájo permitió comprender de manera práctica cómo se integran distintos niveles de abstracción dentro de un sistema.
+
+Se evidenció que, si bien los lenguajes de alto nivel simplifican el desarrollo, dependen de mecanismos de bajo nivel para ejecutar operaciones concretas. La utilización de ensamblador permitió profundizar en concepros como registros, stack y convenciones de llamada. 
+
+Además, la separación entre versiones facilitó validar progresivamente la solución, comenzando por la obtención de datos y finalizando con su procesamiento a nivel de hardware. 

@@ -25,9 +25,28 @@ Esta versión permitió validar:
 - La correcta comunicación con la API.
 - El procesamiento de datos externos.
 - La lógica general del flujo del sistema.
+
 Sin embargo, no incluía aún interacción con lenguajes de bajo nivel.
 
 ### 2. Segunda instancia del proyecto
+En la segunda versión se incorporó la integración con C y ensamblador, cumpliendo con los requerimientos del trabajo.
+
+Python delega el procesamiento del valor obtenido a una función en C, la cual actúa como intermediaria y llama a una rutina en ensamblador. Esta integración se realiza mediante el uso de ctypes, permitiendo cargar dinámicamente la biblioteca compartida generada (libgini.so) .
+
+La rutina en ensamblador:
+
+- Recibe un valor flotante (desde xmm0).
+- Lo convierte a entero.
+- Realiza una operación simple (+1).
+- Devuelve el resultado al programa en C.
+
+Este cambio introduce:
+
+- Uso de convenciones de llamadas (System V ABI).
+- Manejo explícito de registros.
+- Interacción directa con el hardware a través de ASM.
+
+Además, se incorporó Docker para estandarizar el entorno de ejecución y simplificar la compilación del sistema.
 
 ---
 

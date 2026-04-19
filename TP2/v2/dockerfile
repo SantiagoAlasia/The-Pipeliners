@@ -1,0 +1,18 @@
+FROM python:3.9-slim
+
+RUN apt-get update && apt-get install -y gcc nasm
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Compilar ASM + C
+RUN cd c && \
+    nasm -f elf64 gini_asm.s -o gini_asm.o && \
+    gcc -c -fPIC gini.c -o gini.o && \
+    gcc -shared -o libgini.so gini.o gini_asm.o
+
+CMD ["python", "src/main.py"]

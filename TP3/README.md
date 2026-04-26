@@ -44,6 +44,32 @@ Es utilizado en dispositivos como Chromebooks y en algunos equipos de fabricante
 
 ### 2. Linker
 
+*1.1 ¿Que es un linker? ¿que hace?*
+
+Un *linker* es una herramienta dentro del proceso de compilacion que se encarga de tomar uno o mas *objects files* (.o) generados por el compilador y combinarlos para producir un ejecutable. Una de sus funciones es resolver *simbolos*, es decir, resolver las referencias a funciones o varibales presentes en librerias (estaticas o dinamicas). Ademas, el *linker* define en que posiciones de memoria se ubicaran las distintas secciones del programa. (`.text`, `.data`, `.bss`).
+
+En programas que corren sobre un *OS* las direcciones que define el *linker* son direcciones *virtuales* que luego seran traducidas a direcciones *fisicas* de la *Memoria Principal*. Sin embargo, en codigos de bajo nivel como *firmware o BIOS*, el *linker* puede especifiar direcciones fisicas donde debe ubicarse las secciones de codigo en memoria. 
+
+*1.2 ¿Que es la dirección que aparece en el script del linker?¿Porqué es necesaria?*
+
+En la arquitectura x86, la *BIOS* carga el boatloader en la direccion `0x7C00` por convencion. (Estandar historico de la *BIOS*).
+
+Al usar la imagen creada en el ejemplo, al iniciar la pc ocurre las siguientes acciones:
+    1. La BIOS arranca
+    2. Busca el bootloader (USB)
+    3. Lee el *MDR* (sector de 512 bytes en donde pusimos nuestro codigo)
+    4. Lo carga en memoria en la direccion `0x7C00`
+    5. Se ejecuta el codigo
+
+Es por esto que debemos indicarle al *linker* en que direccion de memoria va a estar ubicado nuestro codigo.
+
+*1.3 Compare la salida de objdump con hd, verifique donde fue colocado el programa dentro de la imagen.*
+*1.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
+
+*1.5 ¿Para que se utiliza la opción --oformat binary en el linker?*
+
+`--oformat binary`: Genera codigo ensamblador en formato binario, sin encapsularlo dentro de un archivo ELF como ocurre con los ejecutables normales de usuario.
+
 ### 3. Modo Protegido
 
 ---
@@ -58,4 +84,7 @@ Es utilizado en dispositivos como Chromebooks y en algunos equipos de fabricante
 - https://tuxcare.com/es/blog/logofail-vulnerabilities/
 - https://www.intel.la/content/www/xl/es/download/19392/intel-converged-security-and-management-engine-version-detection-tool-intel-csmevdt.html#:~:text=El%20Intel%C2%AE%20Converged%20Security,de%20seguridad%20recientes%20de%20Intel.
 - https://www.reddit.com/r/hardware/comments/1hfp2gs/what_does_intels_management_engine_do/?tl=es-419
--https://www.coreboot.org/
+- https://www.coreboot.org/
+- https://stackoverflow.com/questions/59881880/what-memory-is-impacted-using-the-location-counter-in-linker-script
+- https://stackoverflow.com/questions/3322911/what-do-linkers-do/33690144#33690144
+- https://stackoverflow.com/questions/22054578/how-can-i-run-a-program-without-an-operating-system/32483545#32483545

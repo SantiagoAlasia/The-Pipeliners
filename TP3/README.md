@@ -44,13 +44,13 @@ Es utilizado en dispositivos como Chromebooks y en algunos equipos de fabricante
 
 ### 2. Linker
 
-*1.1 ¿Que es un linker? ¿que hace?*
+*2.1 ¿Que es un linker? ¿que hace?*
 
 Un *linker* es una herramienta dentro del proceso de compilacion que se encarga de tomar uno o mas *objects files* (.o) generados por el compilador y combinarlos para producir un ejecutable. Una de sus funciones es resolver *simbolos*, es decir, resolver las referencias a funciones o varibales presentes en librerias (estaticas o dinamicas). Ademas, el *linker* define en que posiciones de memoria se ubicaran las distintas secciones del programa. (`.text`, `.data`, `.bss`).
 
 En programas que corren sobre un *OS* las direcciones que define el *linker* son direcciones *virtuales* que luego seran traducidas a direcciones *fisicas* de la *Memoria Principal*. Sin embargo, en codigos de bajo nivel como *firmware o BIOS*, el *linker* puede especifiar direcciones fisicas donde debe ubicarse las secciones de codigo en memoria. 
 
-*1.2 ¿Que es la dirección que aparece en el script del linker?¿Porqué es necesaria?*
+*2.2 ¿Que es la dirección que aparece en el script del linker?¿Porqué es necesaria?*
 
 En la arquitectura x86, la *BIOS* carga el boatloader en la direccion `0x7C00` por convencion. (Estandar historico de la *BIOS*).
 
@@ -63,10 +63,10 @@ Al usar la imagen creada en el ejemplo, al iniciar la pc ocurre las siguientes a
 
 Es por esto que debemos indicarle al *linker* en que direccion de memoria va a estar ubicado nuestro codigo.
 
-*1.3 Compare la salida de objdump con hd, verifique donde fue colocado el programa dentro de la imagen.*
-*1.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
+*2.3 Compare la salida de objdump con hd, verifique donde fue colocado el programa dentro de la imagen.*
+*2.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
 
-*1.5 ¿Para que se utiliza la opción --oformat binary en el linker?*
+*2.5 ¿Para que se utiliza la opción --oformat binary en el linker?*
 
 `--oformat binary`: Genera codigo ensamblador en formato binario, sin encapsularlo dentro de un archivo ELF como ocurre con los ejecutables normales de usuario.
 

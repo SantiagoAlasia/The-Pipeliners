@@ -6,6 +6,12 @@
 - Lucia Feiguin
 - Elena Monutti
 
+## Link del Repositorio
+
+```
+https://github.com/SantiagoAlasia/The-Pipeliners/tree/main/TP3
+```
+
 ## Introducción
 
 En este trabajo práctico se abordan conceptos fundamentales relacionados con el proceso de arranque de una computadora y la ejecución de código a bajo nivel en arquitecturas x86. En particular, se estudian los mecanismos de firmware como UEFI y coreboot, el rol del linker en la construcción de ejecutables y la organización del código en memoria, y el funcionamiento del procesador en modo protegido. 

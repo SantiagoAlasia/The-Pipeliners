@@ -73,7 +73,7 @@ Esto confirma que el programa se encuentra correctamente ubicado al inicio de la
 
 Salidas al ejecutar los comandos:
 
-![alt text](imagenes/image.png)
+![alt text](Linker/image.png)
 
 *2.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
 
@@ -81,13 +81,13 @@ La imagen booteable fue generada y posteriormente grabada en un pendrive utiliza
 
 Luego, se reinició la computadora y se accedió al menú de arranque (boot menu), donde se seleccionó el dispositivo USB correspondiente. Inicialmente, el sistema no detectó el pendrive como booteable debido a que la máquina estaba configurada en modo UEFI, por lo que fue necesario habilitar el modo legacy (CSM) desde la configuración del BIOS.
 
-![alt text](imagenes/image-2.png)
+![alt text](Linker/image-2.png)
 
-![alt text](imagenes/image-1.png)
+![alt text](Linker/image-1.png)
 
 Una vez configurado correctamente, se logró iniciar el sistema desde el pendrive. Al hacerlo, la computadora ejecutó el código contenido en el sector de arranque, mostrando una pantalla negra. Este comportamiento es esperado, ya que el programa contiene únicamente la instrucción hlt, la cual detiene la CPU sin producir salida visible.
 
-![alt text](imagenes/image-3.png)
+![alt text](Linker/image-3.png)
 
 Esto confirma que la imagen fue cargada y ejecutada correctamente en hardware real. Se adjuntaron capturas del menú de arranque y del resultado obtenido.
 
@@ -96,6 +96,49 @@ Esto confirma que la imagen fue cargada y ejecutada correctamente en hardware re
 `--oformat binary`: Genera codigo ensamblador en formato binario, sin encapsularlo dentro de un archivo ELF como ocurre con los ejecutables normales de usuario.
 
 ### 3. Modo Protegido
+
+*3.1 Crear un código assembler que pueda pasar a modo protegido (sin macros).*
+
+Se desarrolló un programa en lenguaje assembler que realiza la transición del procesador desde modo real a modo protegido, sin utilizar macros. El código implementa manualmente los pasos necesarios para habilitar este modo de operación. El mismo se encuentra en el archivo `boot.asm`.
+
+En primer lugar, se define una Tabla de Descriptores Globales (GDT) mínima, compuesta por tres entradas: un descriptor nulo, un segmento de código y un segmento de datos. Ambos segmentos abarcan todo el espacio de memoria y poseen los permisos correspondientes para ejecución y acceso a datos.
+
+Luego, se carga la dirección de la GDT mediante la instrucción `lgdt`. A continuación, se habilita el modo protegido modificando el registro de control CR0, activando el bit PE (Protection Enable). Esto se realiza mediante la lectura del registro, la activación del bit menos significativo y su posterior escritura.
+
+Para completar la transición, se ejecuta un salto largo (`ljmp`), que actualiza el registro CS y limpia el pipeline del procesador, permitiendo comenzar la ejecución en modo protegido. Una vez en este modo, se inicializan los registros de segmento de datos (DS, ES, SS) con el selector correspondiente definido en la GDT, y se configura la pila.
+
+La verificación del correcto funcionamiento se realizó utilizando QEMU junto con GDB. Como se observa en la imagen adjunta, el registro CR0 presenta el valor `0x11`, lo que indica que el bit PE se encuentra activado, confirmando que el procesador se encuentra en modo protegido. Además, los registros de segmento contienen valores como `CS = 0x8` y `DS = 0x10`, lo que evidencia que se están utilizando los selectores definidos en la GDT.
+
+Estos resultados confirman que la transición a modo protegido se realizó correctamente.
+
+![alt text](ModoProtegido/image.png)
+
+*3.2 ¿Cómo sería un programa que tenga dos descriptores de memoria diferentes, uno para cada segmento (código y datos) en espacios de memoria diferenciados?*
+
+En modo protegido, la gestión de memoria se realiza mediante segmentación a través de la Global Descriptor Table (GDT). Cada segmento de memoria se define mediante un descriptor, el cual especifica su base, límite y atributos de acceso.
+
+Para implementar una separación real entre el segmento de código y el segmento de datos, es posible definir dos descriptores distintos dentro de la GDT, asignando a cada uno un espacio de memoria diferente.
+
+En este esquema, el segmento de código puede ubicarse, por ejemplo, en la región de memoria baja del sistema (base 0x00000000), mientras que el segmento de datos se asigna a una región distinta (por ejemplo, base 0x00100000). De esta forma, ambos segmentos no comparten el mismo espacio de direcciones, evitando el solapamiento lógico de memoria.
+
+Cada descriptor se configura con su base y límite correspondientes, además de sus atributos de acceso. El segmento de código se define con permisos de ejecución, mientras que el segmento de datos se define con permisos de lectura/escritura.
+
+Un ejemplo conceptual de esta configuración sería:
+
+- Segmento de código: base = 0x00000000, límite = 0x000FFFFF
+- Segmento de datos: base = 0x00100000, límite = 0x000FFFFF
+
+Esta separación permite que el procesador gestione de forma independiente las regiones de memoria utilizadas para ejecución de instrucciones y almacenamiento de datos. En caso de intentar acceder fuera del rango definido por un segmento, el procesador genera una excepción de protección general (#GP), evitando accesos no autorizados o corrupción de memoria.
+
+En conclusión, la utilización de descriptores con bases y límites diferenciados permite una organización más segura y estructurada del espacio de direcciones en modo protegido.
+
+*3.3 Cambiar los bits de acceso del segmento de datos para que sea de solo lectura,  intentar escribir, ¿Que sucede? ¿Que debería suceder a continuación? (revisar el teórico) Verificarlo con gdb.*
+
+
+
+*3.4 En modo protegido, ¿Con qué valor se cargan los registros de segmento?¿Porque?*
+
+
 
 ---
 

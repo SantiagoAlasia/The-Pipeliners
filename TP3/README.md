@@ -81,13 +81,13 @@ La imagen booteable fue generada y posteriormente grabada en un pendrive utiliza
 
 Luego, se reinició la computadora y se accedió al menú de arranque (boot menu), donde se seleccionó el dispositivo USB correspondiente. Inicialmente, el sistema no detectó el pendrive como booteable debido a que la máquina estaba configurada en modo UEFI, por lo que fue necesario habilitar el modo legacy (CSM) desde la configuración del BIOS.
 
-![alt text](imagenes/image-3.png)
-
 ![alt text](imagenes/image-1.png)
+
+![alt text](imagenes/image-2.png)
 
 Una vez configurado correctamente, se logró iniciar el sistema desde el pendrive. Al hacerlo, la computadora ejecutó el código contenido en el sector de arranque, mostrando una pantalla negra. Este comportamiento es esperado, ya que el programa contiene únicamente la instrucción hlt, la cual detiene la CPU sin producir salida visible.
 
-![alt text](imagenes/image-2.png)
+![alt text](imagenes/image-3.png)
 
 Esto confirma que la imagen fue cargada y ejecutada correctamente en hardware real. Se adjuntaron capturas del menú de arranque y del resultado obtenido.
 

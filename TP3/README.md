@@ -64,7 +64,32 @@ Al usar la imagen creada en el ejemplo, al iniciar la pc ocurre las siguientes a
 Es por esto que debemos indicarle al *linker* en que direccion de memoria va a estar ubicado nuestro codigo.
 
 *2.3 Compare la salida de objdump con hd, verifique donde fue colocado el programa dentro de la imagen.*
+
+Para analizar la codificación de las instrucciones, se generó un archivo objeto a partir de una instrucción simple (hlt) utilizando el ensamblador as, y se inspeccionó con objdump. Se observó que la instrucción hlt corresponde al opcode 0xF4.
+
+Posteriormente, se utilizó la herramienta hd para visualizar el contenido binario de la imagen booteable generada (main.img). Se verificó que el primer byte de la imagen es 0xF4, lo cual coincide con la instrucción hlt obtenida previamente.
+
+Esto confirma que el programa se encuentra correctamente ubicado al inicio de la imagen, tal como lo requiere un sector de arranque en arquitecturas x86.
+
+Salidas al ejecutar los comandos:
+
+![alt text](imagenes/image.png)
+
 *2.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
+
+La imagen booteable fue generada y posteriormente grabada en un pendrive utilizando el comando dd, previa identificación del dispositivo mediante lsblk y desmontaje de sus particiones.
+
+Luego, se reinició la computadora y se accedió al menú de arranque (boot menu), donde se seleccionó el dispositivo USB correspondiente. Inicialmente, el sistema no detectó el pendrive como booteable debido a que la máquina estaba configurada en modo UEFI, por lo que fue necesario habilitar el modo legacy (CSM) desde la configuración del BIOS.
+
+![alt text](imagenes/image-3.png)
+
+![alt text](imagenes/image-1.png)
+
+Una vez configurado correctamente, se logró iniciar el sistema desde el pendrive. Al hacerlo, la computadora ejecutó el código contenido en el sector de arranque, mostrando una pantalla negra. Este comportamiento es esperado, ya que el programa contiene únicamente la instrucción hlt, la cual detiene la CPU sin producir salida visible.
+
+![alt text](imagenes/image-2.png)
+
+Esto confirma que la imagen fue cargada y ejecutada correctamente en hardware real. Se adjuntaron capturas del menú de arranque y del resultado obtenido.
 
 *2.5 ¿Para que se utiliza la opción --oformat binary en el linker?*
 

@@ -8,7 +8,11 @@
 
 ## Introducción
 
-## Objetivos 
+En este trabajo práctico se abordan conceptos fundamentales relacionados con el proceso de arranque de una computadora y la ejecución de código a bajo nivel en arquitecturas x86. En particular, se estudian los mecanismos de firmware como UEFI y coreboot, el rol del linker en la construcción de ejecutables y la organización del código en memoria, y el funcionamiento del procesador en modo protegido. 
+
+A lo largo del trabajo se analizan tanto aspectos teóricos como prácticos, incluyendo la generación de imágenes booteables, su ejecución en entornos virtualizados y en hardware real, y el uso de herramientas como QEMU y GDB para observar el comportamiento del sistema.
+
+## Desarrollo 
 
 ### 1. UEFI / Coreboot
 
@@ -141,6 +145,12 @@ En conclusión, la utilización de descriptores con bases y límites diferenciad
 ---
 
 ## Conclusión general
+
+A lo largo de este trabajo se logró comprender en profundidad el proceso de arranque de una computadora y el rol que cumplen distintos componentes de bajo nivel. Se analizó cómo el firmware inicializa el sistema y permiten la ejecución de programas antes del sistema operativo. 
+
+Además, se estudió el funcionamiento del linker, destacando su importancia en la organización del código en memoria y su rol clave en el desarrollo de software de bajo nivel, como bootloaders. En la parte práctica, se logró generar una imagen booteable, ejecutarla tanto en un entorno virtual como en hardware real, y verificar su correcto funcionamiento. 
+
+Finalmente, se implementó la transición a modo protegido, comprendiendo el uso de la GDT y la configuración de segmentos de memoria. En conjunto, estos resultados permiten tener una visión integral del funcionamiento interno del sistema en sus etapas iniciales.
 
 ---
 

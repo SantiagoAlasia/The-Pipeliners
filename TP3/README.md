@@ -79,7 +79,7 @@ Esto confirma que el programa se encuentra correctamente ubicado al inicio de la
 
 Salidas al ejecutar los comandos:
 
-![alt text](Linker/image.png)
+![alt text](img/Linker/image.png)
 
 #### *2.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
 
@@ -87,13 +87,13 @@ La imagen booteable fue generada y posteriormente grabada en un pendrive utiliza
 
 Luego, se reinició la computadora y se accedió al menú de arranque (boot menu), donde se seleccionó el dispositivo USB correspondiente. Inicialmente, el sistema no detectó el pendrive como booteable debido a que la máquina estaba configurada en modo UEFI, por lo que fue necesario habilitar el modo legacy (CSM) desde la configuración del BIOS.
 
-![alt text](Linker/image-2.png)
+![alt text](img/Linker/image-2.png)
 
-![alt text](Linker/image-1.png)
+![alt text](img/Linker/image-1.png)
 
 Una vez configurado correctamente, se logró iniciar el sistema desde el pendrive. Al hacerlo, la computadora ejecutó el código contenido en el sector de arranque, mostrando una pantalla negra. Este comportamiento es esperado, ya que el programa contiene únicamente la instrucción hlt, la cual detiene la CPU sin producir salida visible.
 
-![alt text](Linker/image-3.png)
+![alt text](img/Linker/image-3.png)
 
 Esto confirma que la imagen fue cargada y ejecutada correctamente en hardware real. Se adjuntaron capturas del menú de arranque y del resultado obtenido.
 
@@ -117,7 +117,7 @@ La verificación del correcto funcionamiento se realizó utilizando QEMU junto c
 
 Estos resultados confirman que la transición a modo protegido se realizó correctamente.
 
-![alt text](ModoProtegido/image.png)
+![alt text](img/ModoProtegido/image.png)
 
 #### *3.2 ¿Cómo sería un programa que tenga dos descriptores de memoria diferentes, uno para cada segmento (código y datos) en espacios de memoria diferenciados?*
 
@@ -140,7 +140,17 @@ En conclusión, la utilización de descriptores con bases y límites diferenciad
 
 #### *3.3 Cambiar los bits de acceso del segmento de datos para que sea de solo lectura,  intentar escribir, ¿Que sucede? ¿Que debería suceder a continuación? (revisar el teórico) Verificarlo con gdb.*
 
+Al intentar escribir en el segmento de datos que fue configurado como solo lectura en el descriptor de segmento, se genera una excepción de protección general (#GP), ya que dicha operación viola los permisos definidos en el descriptor (específicamente, el bit de escritura del campo Type no está habilitado).
+
+Las excepciónes de protección general es el mecanismo utilizado por la arquitectura x86 para indicar accesos inválidos a memoria o violaciones de protección. Ante la generación de esta excepción, el procesador intenta consultar la IDT (Interrupt Descriptor Table) para obtener la dirección del handler correspondiente a dicha interrupción. Sin embargo, en este caso no se ha inicializado una IDT válida, por lo que el CPU no puede transferir el control a ningún manejador de excepciones.
+
 #### *3.4 En modo protegido, ¿Con qué valor se cargan los registros de segmento?¿Porque?*
+
+Cuando se opera en modo protegido, los accesos a memoria se realizan a través de los *registros de segmento*, los cuales contienen selectores que referencian entradas en la *GDT* (Global Descriptor Table) o en la *LDT*(Local Descriptor Table), como se puede observar en la imagen (diagrama extraído del manual de Intel).
+
+![alt text](img/ModoProtegido/image2.png)
+
+Estas tablas contienen *descriptores de segmento*, que proporcionan la dirección base de los segmentos, así como los derechos de acceso, el tipo y la información de uso (los cuales se utilizan para calcular y validar los accesos a memoria). 
 
 ---
 

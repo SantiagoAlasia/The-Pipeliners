@@ -65,14 +65,7 @@ En el ejemplo, al iniciar la pc ocurre las siguientes acciones:
 
 Es por esto que debemos indicarle al *linker* en qué dirección de memoria va a estar ubicado nuestro código.
 
-<<<<<<< HEAD
 #### *2.3 Compare la salida de objdump con hd, verifique donde fue colocado el programa dentro de la imagen.*
-
-#### *2.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
-
-#### *2.5 ¿Para que se utiliza la opción --oformat binary en el linker?*
-=======
-*2.3 Compare la salida de objdump con hd, verifique donde fue colocado el programa dentro de la imagen.*
 
 Para analizar la codificación de las instrucciones, se generó un archivo objeto a partir de una instrucción simple (hlt) utilizando el ensamblador as, y se inspeccionó con objdump. Se observó que la instrucción hlt corresponde al opcode 0xF4.
 
@@ -84,7 +77,7 @@ Salidas al ejecutar los comandos:
 
 ![alt text](Linker/image.png)
 
-*2.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
+#### *2.4 Grabar la imagen en un pendrive y probarla en una pc y subir una foto*
 
 La imagen booteable fue generada y posteriormente grabada en un pendrive utilizando el comando dd, previa identificación del dispositivo mediante lsblk y desmontaje de sus particiones.
 
@@ -100,14 +93,13 @@ Una vez configurado correctamente, se logró iniciar el sistema desde el pendriv
 
 Esto confirma que la imagen fue cargada y ejecutada correctamente en hardware real. Se adjuntaron capturas del menú de arranque y del resultado obtenido.
 
-*2.5 ¿Para que se utiliza la opción --oformat binary en el linker?*
->>>>>>> e151be479b83e638dc992f05efbc3deba9dabea6
+#### *2.5 ¿Para que se utiliza la opción --oformat binary en el linker?*
 
 `--oformat binary`: Genera codigo ensamblador en formato binario, sin encapsularlo dentro de un archivo ELF como ocurre con los ejecutables normales de usuario.
 
 ### 3. Modo Protegido
 
-*3.1 Crear un código assembler que pueda pasar a modo protegido (sin macros).*
+#### *3.1 Crear un código assembler que pueda pasar a modo protegido (sin macros).*
 
 Se desarrolló un programa en lenguaje assembler que realiza la transición del procesador desde modo real a modo protegido, sin utilizar macros. El código implementa manualmente los pasos necesarios para habilitar este modo de operación. El mismo se encuentra en el archivo `boot.asm`.
 
@@ -123,7 +115,7 @@ Estos resultados confirman que la transición a modo protegido se realizó corre
 
 ![alt text](ModoProtegido/image.png)
 
-*3.2 ¿Cómo sería un programa que tenga dos descriptores de memoria diferentes, uno para cada segmento (código y datos) en espacios de memoria diferenciados?*
+#### *3.2 ¿Cómo sería un programa que tenga dos descriptores de memoria diferentes, uno para cada segmento (código y datos) en espacios de memoria diferenciados?*
 
 En modo protegido, la gestión de memoria se realiza mediante segmentación a través de la Global Descriptor Table (GDT). Cada segmento de memoria se define mediante un descriptor, el cual especifica su base, límite y atributos de acceso.
 
@@ -142,13 +134,9 @@ Esta separación permite que el procesador gestione de forma independiente las r
 
 En conclusión, la utilización de descriptores con bases y límites diferenciados permite una organización más segura y estructurada del espacio de direcciones en modo protegido.
 
-*3.3 Cambiar los bits de acceso del segmento de datos para que sea de solo lectura,  intentar escribir, ¿Que sucede? ¿Que debería suceder a continuación? (revisar el teórico) Verificarlo con gdb.*
+#### *3.3 Cambiar los bits de acceso del segmento de datos para que sea de solo lectura,  intentar escribir, ¿Que sucede? ¿Que debería suceder a continuación? (revisar el teórico) Verificarlo con gdb.*
 
-
-
-*3.4 En modo protegido, ¿Con qué valor se cargan los registros de segmento?¿Porque?*
-
-
+#### *3.4 En modo protegido, ¿Con qué valor se cargan los registros de segmento?¿Porque?*
 
 ---
 

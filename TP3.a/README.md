@@ -11,9 +11,9 @@
 ## Objetivos 
 Comprender la arquitectura de la Interfaz de Firmware Extensible Unificada (UEFI) como un entorno pre-sistema operativo, desarrollar binarios nativos, entender su formato y ejecutar rutinas tanto en entornos emulados como en hardware físico (bare metal).
 
-### 1. Exploración del entorno UEFI y la SHELL
+## 1. Exploración del entorno UEFI y la SHELL
 
-#### 1.1 Arranque en el entorno virtual
+### 1.1 Arranque en el entorno virtual
 
 Se ejecutó el emulador QEMU utilizando el firmware UEFI provisto por OVMF, lo que permite simular un entorno pre-sistema operativo moderno en lugar del BIOS tradicional.
 
@@ -23,7 +23,7 @@ Al iniciar, el sistema carga la UEFI Shell, la cual provee una interfaz interact
 
 ![alt text](img/Cap2.png)
 
-#### 1.2 Exploración de dispositivos (Handles y Protocolos)
+### 1.2 Exploración de dispositivos (Handles y Protocolos)
 
 Se utilizó el comando map para identificar los dispositivos disponibles en el sistema, observándose la asignación de identificadores como FS0.
 Posteriormente, se accedió al sistema de archivos mediante fs0: y se listaron sus contenidos con ls, verificando la presencia de archivos en el entorno UEFI.
@@ -44,7 +44,7 @@ En términos de **seguridad**, esta abstracción reduce la superficie de ataque,
 
 En contraste, el BIOS legacy estaba fuertemente acoplado al hardware, lo que lo hacía más difícil de mantener, menos portable y más vulnerable a manipulaciones de bajo nivel.
 
-#### 1.3 Análisis de Variables Globales (NVRAM)
+### 1.3 Análisis de Variables Globales (NVRAM)
 
 Se utilizó el comando dmpstore para inspeccionar las variables persistentes almacenadas en la NVRAM. En particular, se observaron variables como BootOrder y Boot####, las cuales determinan la secuencia de arranque del sistema.
 
@@ -72,7 +72,7 @@ El proceso funciona de la siguiente manera:
 Este mecanismo permite una configuración flexible y persistente del orden de arranque, sin depender de dispositivos físicos fijos como ocurría en el BIOS tradicional.
 
 
-#### 1.4 Footprinting de Memoria y Hardware
+### 1.4 Footprinting de Memoria y Hardware
 
 Se ejecutó el comando `memmap` para visualizar la distribución de memoria del sistema. 
 Este comando permite identificar las distintas regiones utilizadas por el firmware UEFI, incluyendo áreas reservadas para Boot Services, Runtime Services y memoria disponible, proporcionando una visión detallada del uso de memoria en el entorno pre-OS.
@@ -103,9 +103,9 @@ Estas áreas son un objetivo atractivo para los bootkits por varias razones:
 
 Si un atacante logra modificar estas regiones, puede inyectar código que sobreviva reinicios y opere de forma invisible para el sistema operativo, comprometiendo completamente la seguridad de la plataforma.
 
-### 2. Desarrollo, compilación y análisis de seguridad
+## 2. Desarrollo, compilación y análisis de seguridad
 
-#### 2.1 Desarrollo de la aplicación
+### 2.1 Desarrollo de la aplicación
 
 **Pregunta 4: ¿Por qué utilizamos `SystemTable->ConOut->OutputString` en lugar de la función `printf` de C?**
 
@@ -117,7 +117,7 @@ Además, UEFI utiliza cadenas en formato **Unicode (UTF-16)**, mientras que `pri
 
 Por lo tanto, para interactuar con la consola en un entorno pre-OS, es necesario utilizar las funciones proporcionadas por el propio firmware.
 
-#### 2.3 Análisis de Metadatos y Decompilación
+### 2.3 Análisis de Metadatos y Decompilación
 
 Se utilizaron las herramientas `file` y `readelf` para analizar el formato del binario generado (`.efi`). 
 
@@ -149,7 +149,7 @@ En ciberseguridad, esta diferencia es relevante porque:
 
 En este caso particular, `0xCC` corresponde a la instrucción **INT3** (breakpoint en x86), comúnmente utilizada en debugging y también en técnicas de análisis o evasión.
 
-### 3. Ejecución en Hardware Físico (Bare Metal)
+## 3. Ejecución en Hardware Físico (Bare Metal)
 
 ---
 

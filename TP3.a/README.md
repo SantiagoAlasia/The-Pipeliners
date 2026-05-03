@@ -7,6 +7,11 @@
 
 ## Introducción
 
+La Interfaz de Firmware Extensible Unificada (UEFI) representa una evolución significativa respecto al BIOS tradicional, proporcionando un entorno más flexible, modular y seguro para la inicialización del sistema. A diferencia del modelo legacy, UEFI opera como una capa intermedia entre el hardware y el sistema operativo, ofreciendo servicios estandarizados para la gestión de dispositivos, memoria y arranque.
+
+En el contexto de la ciberseguridad, este entorno resulta especialmente relevante, ya que permite la ejecución de código en etapas tempranas del proceso de arranque, incluso antes de que el sistema operativo tome el control. Esto lo convierte en un punto crítico tanto para el desarrollo de soluciones legítimas como para la posible implementación de amenazas avanzadas, como los bootkits.
+
+En este trabajo se explora el funcionamiento del entorno UEFI mediante el uso de herramientas de emulación, el desarrollo de aplicaciones nativas y su posterior ejecución en hardware real, permitiendo analizar tanto su arquitectura como sus implicancias en términos de seguridad.
 
 ## Objetivos 
 Comprender la arquitectura de la Interfaz de Firmware Extensible Unificada (UEFI) como un entorno pre-sistema operativo, desarrollar binarios nativos, entender su formato y ejecutar rutinas tanto en entornos emulados como en hardware físico (bare metal).
@@ -163,7 +168,7 @@ A continuación, se montó el dispositivo y se creó la estructura de directorio
 
 ![alt text](img/Cap14.png)
 
-Dentro de esta ruta, se copió la UEFI Shell oficial, renombrada como BOOTX64.EFI, lo que permite que el firmware la detecte automáticamente durante el proceso de arranque.
+Dentro de esta ruta, se copió la UEFI Shell oficial, ubicada en la ruta `/EFI/BOOT/BOOTX64.EFI`, lo que permite que el firmware la detecte automáticamente durante el proceso de arranque.
 
 ![alt text](img/Cap15.png)
 
@@ -175,11 +180,59 @@ Finalmente, se sincronizaron los cambios y se desmontó el dispositivo de forma 
 
 ### 3.2 Configuración del BIOS/UEFI
 
+Para permitir la ejecución de aplicaciones UEFI no firmadas, se accedió al firmware del sistema durante el arranque presionando la tecla correspondiente (en este caso, DEL en una laptop MSI).
+
+Dentro del menú de configuración, se realizaron los siguientes ajustes:
+
+- Se deshabilitó la opción Secure Boot, ya que el binario desarrollado no cuenta con firma digital válida.
+- Se configuró el modo de arranque en UEFI, asegurando la compatibilidad con aplicaciones en formato PE/COFF.
+
+Estos cambios permiten que el firmware acepte la ejecución de código personalizado desde un dispositivo externo.
+
+![alt text](img/Cap17.png)
 
 ### 3.3 Ejecución en Bare Metal
 
+Una vez configurado el firmware, se procedió a iniciar el sistema desde el dispositivo USB utilizando el menú de arranque (tecla F11 en MSI).
 
+En el menú de selección de dispositivo, se eligió la opción correspondiente al pendrive en modo UEFI:
+
+![alt text](img/Cap18.png)
+
+Esto permitió cargar la UEFI Shell, ejecutándose directamente sobre el firmware sin intervención de un sistema operativo.
+
+![alt text](img/Cap19.png)
+
+Una vez dentro de la shell, se identificó el dispositivo USB como FS0: mediante la tabla de mapeo de dispositivos.
+
+Se accedió al sistema de archivos y se listaron sus contenidos, verificando la presencia del archivo app.efi y la estructura `/EFI/BOOT`.
+
+![alt text](img/Cap20.png)
+
+Posteriormente, se ejecutó la aplicación mediante el comando `app.efi`.
+
+**Observación experimental**
+
+A diferencia de la ejecución en entorno virtual (QEMU), en hardware real no se observó salida en pantalla tras la ejecución del programa.
+
+Sin embargo, la shell dejó de responder a la entrada del usuario, siendo necesario reiniciar el sistema manualmente.
+
+Este comportamiento indica que:
+
+- La aplicación fue efectivamente cargada y ejecutada por el firmware.
+- El control de la ejecución fue transferido al programa.
+- No se retornó correctamente a la shell tras finalizar.
+
+![alt text](img/Cap21.png)
 
 ---
 
 ## Conclusión general
+
+El presente trabajo permitió comprender el funcionamiento del entorno UEFI como una plataforma independiente del sistema operativo, basada en servicios, protocolos y ejecución de aplicaciones nativas.
+
+Se logró desarrollar, compilar y analizar un binario en formato PE/COFF, así como ejecutarlo tanto en un entorno emulado como en hardware real.
+
+La ejecución en bare metal evidenció diferencias significativas respecto a la emulación, particularmente en la interacción con la consola, lo que resalta la dependencia del firmware específico del fabricante.
+
+Desde el punto de vista de la seguridad, se demostró que es posible ejecutar código arbitrario en etapas tempranas del arranque, lo cual representa un vector potencial para ataques de bajo nivel como los bootkits.

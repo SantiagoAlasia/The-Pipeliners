@@ -151,6 +151,35 @@ En este caso particular, `0xCC` corresponde a la instrucción **INT3** (breakpoi
 
 ## 3. Ejecución en Hardware Físico (Bare Metal)
 
+### 3.1 Preparación del medio de arranque (USB)
+
+Para la ejecución en hardware físico, se preparó un dispositivo USB como medio de arranque compatible con UEFI.
+
+En primer lugar, se formateó el pendrive en formato FAT32, requisito establecido por la especificación UEFI para el reconocimiento de dispositivos de arranque.
+
+![alt text](img/Cap13.png)
+
+A continuación, se montó el dispositivo y se creó la estructura de directorios estándar utilizada por UEFI:
+
+![alt text](img/Cap14.png)
+
+Dentro de esta ruta, se copió la UEFI Shell oficial, renombrada como BOOTX64.EFI, lo que permite que el firmware la detecte automáticamente durante el proceso de arranque.
+
+![alt text](img/Cap15.png)
+
+Posteriormente, se copió la aplicación desarrollada (app.efi) en la raíz del dispositivo.
+
+![alt text](img/Cap16.png)
+
+Finalmente, se sincronizaron los cambios y se desmontó el dispositivo de forma segura.
+
+### 3.2 Configuración del BIOS/UEFI
+
+
+### 3.3 Ejecución en Bare Metal
+
+
+
 ---
 
 ## Conclusión general

@@ -127,7 +127,7 @@ sudo dmesg
 
 <div align="center">
   <img src="img/Cap1.png"><br>
-  <em>Figura 1: Log de eventos luego de cargar el módulo de kernel.</em>
+  <em>Figura 2: Log de eventos luego de cargar el módulo de kernel.</em>
 </div>
 
 ```
@@ -136,7 +136,7 @@ lsmod | grep mod
 
 <div align="center">
   <img src="img/Cap2.png"><br>
-  <em>Figura 2: Lista de módulos cargados filtrados por "mod".</em>
+  <em>Figura 3: Lista de módulos cargados filtrados por "mod".</em>
 </div>
 
 ```
@@ -149,7 +149,7 @@ sudo dmesg
 
 <div align="center">
   <img src="img/Cap3.png"><br>
-  <em>Figura 3: Log de eventos luego de quitar el módulo de kernel.</em>
+  <em>Figura 4: Log de eventos luego de quitar el módulo de kernel.</em>
 </div>
 
 ```
@@ -158,7 +158,7 @@ lsmod | grep mod
 
 <div align="center">
   <img src="img/Cap4.png"><br>
-  <em>Figura 4: Lista de módulos cargados filtrados por "mod".</em>
+  <em>Figura 5: Lista de módulos cargados filtrados por "mod".</em>
 </div>
 
 ```
@@ -169,7 +169,7 @@ cat /proc/modules  | grep mod
 
 <div align="center">
   <img src="img/Cap5.png"><br>
-  <em>Figura 5: Lista de módulos cargados filtrados por "mod".</em>
+  <em>Figura 6: Lista de módulos cargados filtrados por "mod".</em>
 </div>
 
 ```
@@ -178,7 +178,7 @@ modinfo mimodulo.ko
 
 <div align="center">
   <img src="img/Cap6.png"><br>
-  <em>Figura 6: Descripción del modulo.</em>
+  <em>Figura 7: Descripción del modulo.</em>
 </div>
 
 ```
@@ -187,16 +187,94 @@ modinfo /lib/modules/$(uname -r)/kernel/crypto/des_generic.ko
 
 <div align="center">
   <img src="img/Cap7.png"><br>
-  <em>Figura 7: Descripción del modulo crypto.</em>
+  <em>Figura 8: Descripción del modulo crypto.</em>
 </div>
 
 ### Preguntas
 
-1. ¿Qué diferencias se pueden observar entre los dos modinfo ? 
+1. ¿Qué diferencias se pueden observar entre los dos modinfo? 
+
+Observando las **Figuras 7 y 8** puede verse que el módulo desarrollado manualmente (**mimodulo.ko**) posee una cantidad reducida de metadata, mientras que el módulo oficial del kernel incluye información adicional como:
+
+- alias
+- dependencias
+- versión
+- firma digital
+
+Uno de los campos más importantes es el correspondiente a la **firma digital**, ya que permite verificar la autenticidad e integridad del módulo antes de que sea cargado por el kernel. Esto resulta especialmente importante en sistemas con Secure Boot habilitado, donde únicamente pueden cargarse módulos firmados por claves consideradas confiables por el sistema.
+
 2. ¿Qué divers/modulos estan cargados en sus propias pc? comparar las salidas con las computadoras de cada integrante del grupo. Expliquen las diferencias. **Carguen un txt con la salida de cada integrante en el repo y pongan un diff en el informe.**
-3. ¿cuales no están cargados pero están disponibles? que pasa cuando el driver de un dispositivo no está disponible. 
-4. Correr hwinfo en una pc real con hw real y agregar la url de la información de hw en el reporte. 
-5. ¿Qué diferencia existe entre un módulo y un programa  ? 
+
+Para revisar los modulos que estan cargados y generar un .txt podemos ejecutar los siguientes comandos:
+
+```
+cd drivers
+
+lsmod > <apellido_del_interante>.txt
+```
+
+## CARGAR EL DIFF DE LOS .TXT
+
+Las diferencias observadas entre los módulos cargados en cada computadora se deben al hardware disponible y a los servicios activos en cada sistema. Por ejemplo, equipos con diferentes placas de red, GPU o dispositivos Bluetooth requieren drivers distintos.
+
+3. ¿Cuales no están cargados pero están disponibles? ¿Que pasa cuando el driver de un dispositivo no está disponible?.
+
+Para determinar qué módulos se encuentran disponibles en el sistema, pero no están actualmente cargados en el kernel, pueden utilizarse distintos comandos.
+
+En primer lugar, podemos listar todos los módulos disponibles:
+
+```
+find /lib/modules/$(uname -r) -name "*.ko.zst"
+```
+
+Este comando muestra los módulos presentes en el **file system**, es decir, aquellos que el kernel puede cargar si son necesarios.
+
+Luego, puede filtrarse la búsqueda según el módulo que se desea inspeccionar:
+
+```
+find /lib/modules/$(uname -r) | grep <nombre_del_modulo>
+```
+
+Si el módulo aparece en la salida, significa que está disponible en el sistema.
+
+Finalmente, para verificar si dicho módulo se encuentra actualmente **cargado** en memoria, puede utilizarse:
+
+```
+lsmod | grep <nombre_del_modulo>
+```
+
+Si el comando no devuelve resultados, entonces el módulo está **disponible pero no cargado**.
+
+Por otro lado, si el driver de un dispositivo no se encuentra disponible, el sistema operativo no podrá comunicarse correctamente con dicho hardware. Como consecuencia, el dispositivo puede no ser detectado, funcionar de manera limitada o directamente quedar inutilizable dentro del sistema operativo.
+
+4. Correr hwinfo en una pc real con hw real y agregar la url de la información de hw en el reporte.
+
+`hwinfo` es una herramienta de Linux que permite obtener información detallada del hardware del sistema.
+
+```
+hwinfo > hwinfo.txt
+```
+
+La salida la podemos encontrar en el archivo `hwinfo.txt` del repo.
+
+5. ¿Qué diferencia existe entre un módulo y un programa? 
+
+Existen varias diferencias entre un **programa de usuario** y un **módulo del kernel**, una de las más importantes es la forma en la que comienzan su ejecución y cómo interactúan con el sistema operativo.
+
+Un programa inicia su ejecución en la función **main()**, ejecuta sus instrucciones y, al finalizar, retorna el control al sistema operativo o al proceso que lo invocó.
+
+En cambio, un módulo del kernel posee **funciones especiales** de inicialización y finalización (module_init(), module_exit()).
+
+La función de inicialización se ejecuta cuando el módulo es **cargado en el kernel** y se utiliza para registrar la funcionalidad que el módulo provee, inicializar estructuras o reservar recursos necesarios. Posteriormente, el módulo permanece cargado y el kernel puede utilizar sus servicios cuando sean requeridos. La función de salida se ejecuta al **descargar** el módulo y permite liberar recursos y limpiar el estado interno.
+
+Otra diferencia fundamental es el **entorno de ejecución**. Los programas se ejecutan en el **espacio de usuario (user space)**, donde poseen acceso restringido a los recursos del sistema. No pueden acceder directamente al hardware ni a la memoria del kernel. Para realizar operaciones privilegiadas, como acceder a archivos, dispositivos o memoria protegida, deben solicitar **servicios al sistema operativo** mediante system calls (syscalls).
+
+Por el contrario, los módulos se ejecutan dentro del **espacio del kernel (kernel space)**, compartiendo el mismo entorno de ejecución que el kernel Linux. Debido a esto, poseen acceso privilegiado al hardware, memoria física y estructuras internas del sistema operativo.
+
+Como consecuencia, si un programa de usuario falla, normalmente solo termina el proceso asociado. Sin embargo, si un módulo del kernel contiene errores, puede comprometer la estabilidad completa del sistema.
+
+Otra característica importante es que los módulos pueden cargarse y descargarse dinámicamente en tiempo de ejecución permitiendo extender las funcionalidades del kernel sin necesidad de reiniciar el sistema operativo.
+
 6. ¿Cómo puede ver una lista de las llamadas al sistema que realiza un simple helloworld en c?
 7. ¿Qué es un segmentation fault? ¿Cómo lo maneja el kernel y como lo hace un programa?
 8. ¿Se animan a intentar firmar un módulo de kernel ? y documentar el proceso ?  https://askubuntu.com/questions/770205/how-to-sign-kernel-modules-with-sign-file

@@ -324,10 +324,32 @@ cd drivers
 
 lsmod > <apellido_del_interante>.txt
 ```
+Para comparar los módulos cargados en las computadoras de los integrantes del grupo, cada uno generó un archivo de texto con la salida del comando `lsmod`.
 
-## CARGAR EL DIFF DE LOS .TXT
+Los archivos agregados al repositorio fueron:
 
-Las diferencias observadas entre los módulos cargados en cada computadora se deben al hardware disponible y a los servicios activos en cada sistema. Por ejemplo, equipos con diferentes placas de red, GPU o dispositivos Bluetooth requieren drivers distintos.
+- `drivers/alasia.txt`
+- `drivers/monutti.txt`
+- `drivers/feiguin.txt`
+
+Luego se generaron los archivos de diferencias utilizando el comando `diff -u`:
+
+```bash
+diff -u feiguin.txt monutti.txt > diff_feiguin_monutti.txt
+diff -u feiguin.txt alasia.txt > diff_feiguin_alasia.txt
+```
+
+Los archivos generados fueron:
+
+```bash
+drivers/diff_feiguin_monutti.txt
+drivers/diff_feiguin_alasia.txt
+```
+A partir de la comparación se observaron diferencias entre los módulos cargados en cada sistema. Estas diferencias se deben principalmente al hardware disponible, los dispositivos conectados, los servicios activos y el entorno donde se ejecuta cada sistema operativo.
+
+En la salida correspondiente a Lucia Feiguin se observan módulos como vboxsf, vboxguest y vboxvideo, los cuales están asociados a VirtualBox. Esto indica que el sistema Linux utilizado se está ejecutando dentro de un entorno virtualizado. Por este motivo, aparecen módulos específicos de virtualización que pueden no estar presentes en las computadoras de los otros integrantes.
+
+También pueden existir diferencias en módulos relacionados con red, sonido, Bluetooth, almacenamiento, GPU, dispositivos USB o herramientas del sistema. Esto demuestra que Linux carga dinámicamente distintos drivers según las características particulares de cada equipo y los recursos que se estén utilizando al momento de ejecutar lsmod.
 
 3. ¿Cuales no están cargados pero están disponibles? ¿Que pasa cuando el driver de un dispositivo no está disponible?.
 

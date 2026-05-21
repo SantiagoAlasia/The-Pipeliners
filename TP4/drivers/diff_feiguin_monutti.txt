@@ -1,0 +1,128 @@
+--- feiguin.txt	2026-05-21 21:29:22.457965637 +0000
++++ monutti.txt	2026-05-21 21:28:54.268267502 +0000
+@@ -1,4 +1,5 @@
+ Module                  Size  Used by
++mimodulo               12288  0
+ isofs                  61440  1
+ snd_seq_dummy          12288  0
+ snd_hrtimer            12288  1
+@@ -6,85 +7,90 @@
+ vboxguest              57344  5 vboxsf
+ vboxvideo              36864  0
+ drm_vram_helper        24576  1 vboxvideo
+-veth                   45056  0
+-nf_conntrack_netlink    57344  0
+-xt_nat                 12288  10
+-xt_tcpudp              16384  0
+-xt_conntrack           12288  2
+-xt_MASQUERADE          16384  2
++xt_conntrack           12288  1
++xt_MASQUERADE          16384  1
+ bridge                425984  0
+ stp                    12288  1 bridge
+ llc                    16384  2 bridge,stp
++xfrm_user              65536  1
++xfrm_algo              16384  1 xfrm_user
+ xt_set                 20480  0
+ ip_set                 61440  1 xt_set
+-nft_chain_nat          12288  9
+-nf_nat                 61440  3 xt_nat,nft_chain_nat,xt_MASQUERADE
+-nf_conntrack          192512  5 xt_conntrack,nf_nat,xt_nat,nf_conntrack_netlink,xt_MASQUERADE
++nft_chain_nat          12288  5
++nf_nat                 61440  2 nft_chain_nat,xt_MASQUERADE
++nf_conntrack          192512  3 xt_conntrack,nf_nat,xt_MASQUERADE
+ nf_defrag_ipv6         24576  1 nf_conntrack
+ nf_defrag_ipv4         12288  1 nf_conntrack
+ xt_addrtype            12288  4
+-nft_compat             20480  18
+-nf_tables             385024  230 nft_compat,nft_chain_nat
+-xfrm_user              65536  1
+-xfrm_algo              16384  1 xfrm_user
+-overlay               221184  2
++nft_compat             20480  6
++nf_tables             385024  57 nft_compat,nft_chain_nat
++vxlan                 155648  0
++ip6_udp_tunnel         16384  1 vxlan
++udp_tunnel             32768  1 vxlan
++overlay               221184  0
+ qrtr                   53248  2
++ipmi_devintf           20480  0
++ipmi_msghandler        94208  1 ipmi_devintf
+ snd_intel8x0           53248  1
++intel_rapl_msr         20480  0
++intel_rapl_common      53248  1 intel_rapl_msr
+ snd_ac97_codec        196608  1 snd_intel8x0
+ ac97_bus               12288  1 snd_ac97_codec
+ snd_pcm               200704  2 snd_intel8x0,snd_ac97_codec
+-intel_rapl_msr         20480  0
+-snd_seq_midi           24576  0
+-intel_rapl_common      53248  1 intel_rapl_msr
+-snd_seq_midi_event     16384  1 snd_seq_midi
+-snd_rawmidi            57344  1 snd_seq_midi
+ intel_uncore_frequency_common    20480  0
+ intel_pmc_core        135168  0
+ pmt_telemetry          16384  1 intel_pmc_core
++binfmt_misc            24576  1
+ pmt_discovery          20480  1 pmt_telemetry
+ pmt_class              20480  2 pmt_telemetry,pmt_discovery
+-snd_seq               122880  9 snd_seq_midi,snd_seq_midi_event,snd_seq_dummy
++snd_seq_midi           24576  0
++snd_seq_midi_event     16384  1 snd_seq_midi
+ intel_pmc_ssram_telemetry    16384  1 intel_pmc_core
+ intel_vsec             24576  2 intel_pmc_ssram_telemetry,pmt_telemetry
++snd_rawmidi            57344  1 snd_seq_midi
++snd_seq               122880  9 snd_seq_midi,snd_seq_midi_event,snd_seq_dummy
++polyval_clmulni        12288  0
+ snd_seq_device         16384  3 snd_seq,snd_seq_midi,snd_rawmidi
+ snd_timer              53248  3 snd_seq,snd_hrtimer,snd_pcm
+-polyval_clmulni        12288  0
+ ghash_clmulni_intel    12288  0
+ aesni_intel            98304  0
+ rapl                   20480  0
+ snd                   143360  11 snd_seq,snd_seq_device,snd_intel8x0,snd_timer,snd_ac97_codec,snd_pcm,snd_rawmidi
+-vmwgfx                471040  2
+ soundcore              16384  1 snd
+ i2c_piix4              32768  0
+ i2c_smbus              20480  1 i2c_piix4
++vmwgfx                471040  5
+ drm_ttm_helper         16384  4 vmwgfx,drm_vram_helper,vboxvideo
+ ttm                   126976  3 vmwgfx,drm_vram_helper,drm_ttm_helper
+-joydev                 32768  0
+ input_leds             12288  0
+-binfmt_misc            24576  1
++joydev                 32768  0
+ mac_hid                12288  0
+ serio_raw              20480  0
+ sch_fq_codel           24576  2
+ msr                    12288  0
+ parport_pc             53248  0
++nvme_fabrics           36864  0
+ ppdev                  24576  0
+ lp                     32768  0
++nvme_core             233472  1 nvme_fabrics
+ parport                73728  3 parport_pc,lp,ppdev
++nvme_keyring           20480  2 nvme_core,nvme_fabrics
++nvme_auth              28672  1 nvme_core
+ efi_pstore             12288  0
+-nfnetlink              20480  6 nft_compat,nf_conntrack_netlink,nf_tables,ip_set
++nfnetlink              20480  5 nft_compat,nf_tables,ip_set
+ dmi_sysfs              20480  0
+ ip_tables              32768  0
+-x_tables               65536  8 xt_conntrack,nft_compat,xt_tcpudp,xt_addrtype,xt_nat,xt_set,ip_tables,xt_MASQUERADE
++x_tables               65536  6 xt_conntrack,nft_compat,xt_addrtype,xt_set,ip_tables,xt_MASQUERADE
+ autofs4                57344  2
+ hid_generic            12288  0
+ usbhid                 77824  0
+ hid                   262144  2 usbhid,hid_generic
+ psmouse               217088  0
+-e1000                 180224  0
+-video                  77824  0
+ vga16fb                32768  0
++video                  77824  0
+ ahci                   49152  1
+ vgastate               20480  1 vga16fb
++libahci                53248  1 ahci
+ pata_acpi              12288  0
++e1000                 180224  0
+ wmi                    28672  1 video
+-libahci                53248  1 ahci

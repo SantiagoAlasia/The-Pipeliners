@@ -13,7 +13,23 @@ https://github.com/SantiagoAlasia/The-Pipeliners/tree/main/TP4
 
 ## Introducción
 
+Los módulos del kernel constituyen uno de los mecanismos fundamentales mediante los cuales Linux extiende sus funcionalidades de manera dinámica, permitiendo agregar soporte para dispositivos, sistemas de archivos y distintas características del sistema sin necesidad de recompilar o reiniciar el kernel completo.
+
+En este trabajo práctico se estudió el funcionamiento básico de los módulos del kernel Linux, su compilación, carga y descarga dinámica, así como también distintos conceptos relacionados con la arquitectura del sistema operativo, el espacio de usuario y el espacio del kernel, drivers y llamadas al sistema.
+
+Además, se analizaron mecanismos de seguridad modernos relacionados con Secure Boot y la firma digital de módulos, evaluando su importancia para prevenir la carga de código malicioso dentro del kernel.
+
 ## Objetivos 
+
+- Comprender el funcionamiento básico de los módulos del kernel Linux.
+- Compilar, cargar y descargar módulos del kernel utilizando herramientas del sistema.
+- Analizar diferencias entre programas de usuario y módulos del kernel.
+- Investigar el funcionamiento de drivers y dispositivos en Linux.
+- Observar llamadas al sistema mediante herramientas de tracing.
+- Comprender el manejo de errores de memoria como segmentation faults.
+- Investigar mecanismos de seguridad relacionados con Secure Boot y firmas digitales.
+- Realizar la firma digital de un módulo de kernel y verificar su autenticidad.
+- Analizar implicancias de seguridad asociadas a la carga de módulos no confiables.
 
 ## Desafio 1
 
@@ -632,3 +648,11 @@ Esto ayuda a proteger el sistema contra amenazas como:
 - malware persistente de bajo nivel
 
 ## Conclusión general
+
+A lo largo del desarrollo del trabajo práctico se logró comprender el funcionamiento general de los módulos del kernel Linux y la diferencia entre el espacio de usuario y el espacio privilegiado del sistema operativo.
+
+La práctica permitió familiarizarse con herramientas fundamentales del entorno Linux, como `lsmod`, `modinfo`, `dmesg`, `strace`, `hwinfo` y `checkinstall`, además de observar cómo interactúan los programas y módulos con el kernel mediante system calls y drivers.
+
+También se analizaron aspectos importantes relacionados con la seguridad del sistema, particularmente el uso de firmas digitales y Secure Boot para evitar la carga de módulos no confiables o potencialmente maliciosos.
+
+Finalmente, la experiencia permitió comprender los riesgos asociados al desarrollo en espacio de kernel, donde errores simples pueden comprometer la estabilidad completa del sistema operativo.

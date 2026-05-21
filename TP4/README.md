@@ -63,7 +63,7 @@ gcc hola.c -o hola
   <em>Figura 1: Ejecución del programa Hello World.</em> 
   </div>
 
-Posteriormente se creó un `Makefile` con una regla `install` para permitir el uso de `checkinstall.
+Posteriormente se creó un `Makefile` con una regla `install` para permitir el uso de `checkinstall`.
 
 Finalmente se ejecutó:
 
@@ -135,7 +135,7 @@ Estas llamadas permiten interactuar con archivos, dispositivos y otros recursos 
 
 En cambio, un módulo del kernel se ejecuta en espacio de kernel, por lo que no utiliza bibliotecas de usuario como libc. Las funciones y símbolos que puede utilizar son proporcionados por el kernel.
 
-Estas funciones pueden observarce en el archivo ´/proc/kallsyms´, el cual contiene la tabla de símbolos del kernel cargados actualmente en memoria, incluyendo funciones y variables globales disponibles para otros módulos.
+Estas funciones pueden observarse en el archivo ´/proc/kallsyms´, el cual contiene la tabla de símbolos del kernel cargados actualmente en memoria, incluyendo funciones y variables globales disponibles para otros módulos.
 
 Por ejemplo:
 
@@ -166,7 +166,7 @@ En el caso de los módulos del kernel sucede algo similar, aunque la memoria es 
 
 4. Drivers. Investigar contenido de /dev.
 
-Los **Drivers** o controladores de dispositivos son un módulos especiales que proporcionan funcionalidad para un hardware especifico, como discos, teclados, placas de red, GPU o dispositivos USB. Como en los sistemas **Unix** los dispositivos se mapean como archivos, los vamos a encontrar asociados con alguna entrada en `/dev`. Esto permite interactuar con el hardware utilizando operaciones similares a las realizadas sobre archivos comunes, como `read()` o `write()`.
+Los **Drivers** o controladores de dispositivos son módulos especiales que proporcionan funcionalidad para un hardware específico, como discos, teclados, placas de red, GPU o dispositivos USB. Como en los sistemas **Unix** los dispositivos se mapean como archivos, los vamos a encontrar asociados con alguna entrada en `/dev`. Esto permite interactuar con el hardware utilizando operaciones similares a las realizadas sobre archivos comunes, como `read()` o `write()`.
 
 Para inspeccionar el contenido de `/dev` pueden utilizarse los siguientes comandos:
 
@@ -457,7 +457,7 @@ int *ptr = NULL;
 
 En este caso el proceso intenta escribir en una dirección inválida y el procesador genera una excepción de memoria.
 
-El kernel Linux detecta esta situación mediante la Memory Management Unit (MMU) del procesador. Cuando ocurre el acceso inválido, el hardware genera una interrupción conocida como page fault y el kernel verifica si el acceso es válido.
+La MMU (Memory Management Unit) detecta el acceso inválido y genera una excepción que luego es manejada por el kernel Linux. Cuando ocurre el acceso inválido, el hardware genera una interrupción conocida como page fault y el kernel verifica si el acceso es válido.
 
 Si el acceso no está permitido, el kernel envía al proceso la señal:
 
@@ -478,10 +478,84 @@ Esto demuestra por qué el desarrollo de módulos del kernel requiere mucho más
 
 8. ¿Se animan a intentar firmar un módulo de kernel ? y documentar el proceso ?  https://askubuntu.com/questions/770205/how-to-sign-kernel-modules-with-sign-file
 
+Con el objetivo de mejorar la seguridad del sistema y verificar la autenticidad de los módulos cargados en el kernel, se realizó la firma digital del módulo `mimodulo.ko`.
 
+Primero se generó una clave privada junto con un certificado X.509 utilizando OpenSSL:
+
+```
+openssl req -new -x509 -newkey rsa:2048 -keyout MOK.priv -outform DER -out MOK.der -nodes -days 36500 -subj "/CN=ModuloKernel/"
+```
+
+Esto generó los archivos:
+
+- `MOK.priv`
+- `MOK.der`
+
+<div align="center">
+  <img src="img/Cap13.png"><br>
+  <em>Figura 14: Generación de claves y certificado para la firma del módulo.</em>
+</div>
+
+Posteriormente se utilizó el script `sign-file`, provisto por los headers del kernel Linux, para aplicar la firma digital al módulo:
+
+```
+/usr/src/linux-headers-$(uname -r)/scripts/sign-file sha256 MOK.priv MOK.der mimodulo.ko
+```
+
+Finalmente se verificó la presencia de la firma utilizando:
+
+```
+modinfo mimodulo.ko
+```
+
+<div align="center">
+  <img src="img/Cap14.png"><br>
+  <em>Figura 15: Verificación de la firma digital del módulo mediante modinfo.</em>
+</div>
+
+Puede observarse la aparición de campos relacionados con la firma digital, como `signer`, `sig_key` y `signature`, los cuales indican que el módulo fue firmado correctamente.
 
 9. Agregar evidencia de la compilación, carga y descarga de su propio módulo imprimiendo el nombre del equipo en los registros del kernel. 
 
+Se modificó el módulo del kernel para imprimir el hostname del sistema en los registros del kernel utilizando la estructura `init_uts_ns`.
+
+Para ello se agregó el siguiente include:
+
+```
+#include <linux/utsname.h>
+```
+
+Luego se modificó la llamada a `printk()`:
+
+```
+printk(KERN_INFO "Modulo cargado en el equipo: %s\n", init_uts_ns.name.nodename);
+```
+
+Posteriormente se recompiló el módulo:
+
+```
+make clean
+make
+```
+
+y se cargó nuevamente utilizando:
+
+```
+sudo insmod mimodulo.ko
+```
+
+Finalmente se verificó el mensaje generado mediante:
+
+```
+sudo dmesg | tail
+```
+
+<div align="center">
+  <img src="img/Cap15.png"><br>
+  <em>Figura 16: Registro del kernel mostrando el hostname del equipo.</em>
+</div>
+
+Puede observarse que el módulo imprime correctamente el nombre del equipo dentro de los logs del kernel.
 
 
 10. ¿Que pasa si mi compañero con secure boot habilitado intenta cargar un módulo firmado por mi? 

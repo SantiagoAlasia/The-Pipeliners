@@ -18,8 +18,104 @@ https://github.com/SantiagoAlasia/The-Pipeliners/tree/main/TP4
 ## Desafio 1
 
 ### ¿Qué es checkinstall y para qué sirve?
+
+`checkinstall` es una herramienta que permite crear paquetes instalables (`.deb`, `.rpm`, etc.) a partir del proceso de instalación de un programa compilado desde código fuente.
+
+Normalmente, muchos programas se instalan utilizando:
+
+```
+make install
+```
+
+Sin embargo, este método copia archivos directamente al sistema sin que el gestor de paquetes tenga registro de ellos. Como consecuencia, posteriormente resulta difícil desinstalar o administrar dichos archivos.
+
+`checkinstall` soluciona este problema interceptando el proceso de instalación y generando un paquete instalable administrado por el sistema de paquetes de Linux.
+
+Entre sus principales ventajas se encuentran:
+
+- facilidad para desinstalar software
+- mejor control de versiones
+- integración con el gestor de paquetes del sistema
+- posibilidad de distribuir aplicaciones compiladas localmente
+
+
 ### ¿Se animan a usarlo para empaquetar un hello world? 
+
+Primero se desarrolló un programa simple en C:
+
+```
+#include <stdio.h>
+
+int main() {
+    printf("Hola mundo desde checkinstall\n");
+    return 0;
+}
+```
+
+Luego se compiló utilizando:
+
+```
+gcc hola.c -o hola
+```
+
+<div align="center"> 
+  <img src="img/Cap9.png"><br> 
+  <em>Figura 1: Ejecución del programa Hello World.</em> 
+  </div>
+
+Posteriormente se creó un `Makefile` con una regla `install` para permitir el uso de `checkinstall.
+
+Finalmente se ejecutó:
+
+```
+sudo checkinstall
+```
+
+La herramienta generó automáticamente un paquete `.deb` instalable administrado por el sistema de paquetes.
+
+<div align="center"> 
+  <img src="img/Cap10.png"><br> 
+  <em>Figura 2: Generación del paquete utilizando checkinstall.</em> 
+</div> 
+
+<div align="center"> 
+  <img src="img/Cap11.png"><br> 
+  <em>Figura 3: Paquete `.deb` generado.</em> 
+</div>
+
+Posteriormente se instaló el paquete generado utilizando `dpkg`:
+
+```
+sudo dpkg -i checkinstall-test_20260521-1_amd64.deb
+```
+
+Luego se verificó su correcto funcionamiento ejecutando el binario instalado:
+
+```
+hola
+```
+
+<div align="center"> 
+  <img src="img/Cap12.png"><br> 
+  <em>Figura 4: Instalación y ejecución del paquete generado.</em> 
+</div>
+
 ### Revisar la bibliografía para impulsar acciones que permitan mejorar la seguridad del kernel, concretamente: evitando cargar módulos que no estén firmados. rootkits ? 
+
+Los módulos del kernel se ejecutan en espacio privilegiado (*kernel space*), por lo que poseen acceso completo al hardware y a estructuras internas del sistema operativo. Debido a esto, un módulo malicioso puede comprometer completamente la seguridad y estabilidad del sistema.
+
+Una de las principales amenazas relacionadas con módulos del kernel son los **rootkits**, programas maliciosos diseñados para ocultar procesos, archivos, conexiones de red o elevar privilegios dentro del sistema.
+
+Para reducir estos riesgos, Linux incorpora mecanismos de verificación mediante **firmas digitales**. Cuando Secure Boot se encuentra habilitado, el kernel puede configurarse para permitir únicamente la carga de módulos firmados por entidades confiables.
+
+Esto garantiza:
+
+- autenticidad del módulo
+- integridad del código
+- protección contra modificaciones maliciosas
+- prevención de rootkits a nivel kernel
+
+En caso de que un módulo no esté firmado o utilice una clave no confiable, el sistema puede impedir su carga.
 
 ## Desafio 2
 
@@ -57,7 +153,7 @@ En la *Figura 1* puede observarse una distribución lógica entre el espacio de 
 
 <div align="center">
   <img src="img/Cap-User-Kernel-Space.png"><br>
-  <em>Figura 1: Espacio de Usuario vs Espacio del Kernel</em>
+  <em>Figura 5: Espacio de Usuario vs Espacio del Kernel</em>
 </div>
 
 3. Espacio de datos.
@@ -127,7 +223,7 @@ sudo dmesg
 
 <div align="center">
   <img src="img/Cap1.png"><br>
-  <em>Figura 2: Log de eventos luego de cargar el módulo de kernel.</em>
+  <em>Figura 6: Log de eventos luego de cargar el módulo de kernel.</em>
 </div>
 
 ```
@@ -136,7 +232,7 @@ lsmod | grep mod
 
 <div align="center">
   <img src="img/Cap2.png"><br>
-  <em>Figura 3: Lista de módulos cargados filtrados por "mod".</em>
+  <em>Figura 7: Lista de módulos cargados filtrados por "mod".</em>
 </div>
 
 ```
@@ -149,7 +245,7 @@ sudo dmesg
 
 <div align="center">
   <img src="img/Cap3.png"><br>
-  <em>Figura 4: Log de eventos luego de quitar el módulo de kernel.</em>
+  <em>Figura 8: Log de eventos luego de quitar el módulo de kernel.</em>
 </div>
 
 ```
@@ -158,7 +254,7 @@ lsmod | grep mod
 
 <div align="center">
   <img src="img/Cap4.png"><br>
-  <em>Figura 5: Lista de módulos cargados filtrados por "mod".</em>
+  <em>Figura 9: Lista de módulos cargados filtrados por "mod".</em>
 </div>
 
 ```
@@ -169,7 +265,7 @@ cat /proc/modules  | grep mod
 
 <div align="center">
   <img src="img/Cap5.png"><br>
-  <em>Figura 6: Lista de módulos cargados filtrados por "mod".</em>
+  <em>Figura 10: Lista de módulos cargados filtrados por "mod".</em>
 </div>
 
 ```
@@ -178,7 +274,7 @@ modinfo mimodulo.ko
 
 <div align="center">
   <img src="img/Cap6.png"><br>
-  <em>Figura 7: Descripción del modulo.</em>
+  <em>Figura 11: Descripción del modulo.</em>
 </div>
 
 ```
@@ -187,7 +283,7 @@ modinfo /lib/modules/$(uname -r)/kernel/crypto/des_generic.ko
 
 <div align="center">
   <img src="img/Cap7.png"><br>
-  <em>Figura 8: Descripción del modulo crypto.</em>
+  <em>Figura 12: Descripción del modulo crypto.</em>
 </div>
 
 ### Preguntas
@@ -319,7 +415,7 @@ Genera un resumen estadístico de las llamadas al sistema realizadas.
 
 <div align="center"> 
   <img src="img/Cap8.png"><br> 
-  <em>Figura 9: Resumen de system calls obtenidas mediante strace.</em> 
+  <em>Figura 13: Resumen de system calls obtenidas mediante strace.</em> 
 </div>
 
 Entre las syscalls más comunes que aparecerán se encuentran:

@@ -276,13 +276,189 @@ Como consecuencia, si un programa de usuario falla, normalmente solo termina el 
 Otra característica importante es que los módulos pueden cargarse y descargarse dinámicamente en tiempo de ejecución permitiendo extender las funcionalidades del kernel sin necesidad de reiniciar el sistema operativo.
 
 6. ¿Cómo puede ver una lista de las llamadas al sistema que realiza un simple helloworld en c?
+
+Para observar las system calls que realiza un programa en Linux puede utilizarse la herramienta strace.
+
+Primero creamos un programa simple:
+
+```
+#include <stdio.h>
+
+int main() {
+    printf("Hola mundo\n");
+    return 0;
+}
+```
+
+Compilación:
+
+```
+gcc -Wall hola.c -o hola
+```
+
+Luego ejecutamos strace:
+```
+strace ./hola
+```
+
+Este comando muestra todas las llamadas al sistema realizadas por el programa, incluyendo operaciones de carga de librerías dinámicas, acceso a memoria, escritura en pantalla y finalización del proceso.
+
+También pueden utilizarse variantes útiles:
+
+```
+strace -tt ./hola
+```
+
+Muestra timestamps precisos para cada syscall.
+
+```
+strace -c ./hola
+```
+
+Genera un resumen estadístico de las llamadas al sistema realizadas.
+
+<div align="center"> 
+  <img src="img/Cap8.png"><br> 
+  <em>Figura 9: Resumen de system calls obtenidas mediante strace.</em> 
+</div>
+
+Entre las syscalls más comunes que aparecerán se encuentran:
+
+- `execve()`
+- `mmap()`
+- `openat()`
+- `read()`
+- `write()`
+- `close()`
+
+Por ejemplo, la llamada:
+
+```
+write(1, "Hola mundo\n", 11)
+```
+
+indica que el programa escribe el texto en el descriptor de archivo 1, correspondiente a la salida estándar (`stdout`).
+
+Esto demuestra que incluso un programa muy simple depende de múltiples servicios proporcionados por el kernel Linux.
+
 7. ¿Qué es un segmentation fault? ¿Cómo lo maneja el kernel y como lo hace un programa?
+
+Un segmentation fault (o simplemente segfault) ocurre cuando un programa intenta acceder a una región de memoria que no tiene permitida.
+
+Algunos ejemplos comunes son:
+
+- acceder a un puntero NULL
+- escribir fuera de los límites de un arreglo
+- acceder a memoria liberada
+- intentar ejecutar memoria no ejecutable
+
+Ejemplo:
+
+```
+int *ptr = NULL;
+*ptr = 10;
+```
+
+En este caso el proceso intenta escribir en una dirección inválida y el procesador genera una excepción de memoria.
+
+El kernel Linux detecta esta situación mediante la Memory Management Unit (MMU) del procesador. Cuando ocurre el acceso inválido, el hardware genera una interrupción conocida como page fault y el kernel verifica si el acceso es válido.
+
+Si el acceso no está permitido, el kernel envía al proceso la señal:
+
+`SIGSEGV`
+
+Por defecto, esta señal finaliza el programa y puede generar un core dump para depuración.
+
+En programas de usuario, normalmente el fallo solo afecta al proceso que cometió el error gracias al aislamiento de memoria entre procesos.
+
+Sin embargo, en el caso de un módulo del kernel, el código se ejecuta en espacio privilegiado compartiendo memoria con el kernel. Por esta razón, un acceso inválido dentro de un módulo puede provocar:
+
+- kernel panic
+- congelamiento del sistema
+- reinicio completo
+- corrupción de memoria
+
+Esto demuestra por qué el desarrollo de módulos del kernel requiere mucho más cuidado que la programación tradicional en espacio de usuario.
+
 8. ¿Se animan a intentar firmar un módulo de kernel ? y documentar el proceso ?  https://askubuntu.com/questions/770205/how-to-sign-kernel-modules-with-sign-file
+
+
+
 9. Agregar evidencia de la compilación, carga y descarga de su propio módulo imprimiendo el nombre del equipo en los registros del kernel. 
+
+
+
 10. ¿Que pasa si mi compañero con secure boot habilitado intenta cargar un módulo firmado por mi? 
+
+Aunque el módulo esté firmado correctamente, el sistema solamente permitirá cargarlo si la clave utilizada para firmarlo pertenece a una entidad confiable para el sistema.
+
+Si el compañero no tiene registrada la clave pública (MOK.der) dentro de su sistema, el kernel rechazará el módulo.
+
+Generalmente aparecerá un mensaje similar a:
+
+`Required key not available`
+
+o
+
+`module verification failed`
+
+Esto sucede porque Secure Boot verifica que los módulos hayan sido firmados por claves autorizadas.
+
+Para que el módulo pueda cargarse correctamente, el compañero debe importar previamente el certificado público mediante:
+
+```
+mokutil --import MOK.der
+```
+
 11. Dada la siguiente nota https://arstechnica.com/security/2024/08/a-patch-microsoft-spent-2-years-preparing-is-making-a-mess-for-some-linux-users/ 
+
+Según el artículo publicado por Ars Technica, Microsoft distribuyó una actualización relacionada con Secure Boot y la vulnerabilidad conocida como BootHole.
+
+El problema principal fue que algunos sistemas Linux con arranque dual comenzaron a tener problemas para iniciar correctamente luego de aplicar las nuevas políticas de seguridad.
+
 12. ¿Cuál fue la consecuencia principal del parche de Microsoft sobre GRUB en sistemas con arranque dual (Linux y Windows)?
+
+La consecuencia principal fue que muchos sistemas Linux dejaron de arrancar correctamente porque las nuevas políticas de Secure Boot bloquearon versiones antiguas de GRUB consideradas vulnerables.
+
+Como resultado:
+
+- algunos equipos no podían iniciar Linux
+- aparecían errores relacionados con Secure Boot
+- ciertos sistemas entraban directamente al firmware UEFI
+
+Esto afectó especialmente a usuarios con configuraciones dual boot entre Linux y Windows.
+
 13. ¿Qué implicancia tiene desactivar Secure Boot como solución al problema descrito en el artículo?
+
+Desactivar Secure Boot permite volver a cargar bootloaders o módulos no firmados, solucionando temporalmente el problema de compatibilidad.
+
+Sin embargo, esto reduce significativamente la seguridad del sistema porque elimina la validación criptográfica durante el proceso de arranque.
+
+Como consecuencia:
+
+- podrían cargarse bootloaders modificados
+- podrían ejecutarse rootkits de bajo nivel
+- el sistema queda más expuesto a malware persistente
+
+Por esta razón, desactivar Secure Boot debe considerarse solamente una solución temporal o de diagnóstico.
+
 14. ¿Cuál es el propósito principal del Secure Boot en el proceso de arranque de un sistema?
+
+El propósito principal de Secure Boot es garantizar que únicamente se ejecute software confiable durante el arranque del sistema.
+
+Para ello, Secure Boot verifica firmas digitales de:
+
+- bootloaders
+- kernels
+- drivers
+- módulos
+
+De esta manera se evita que software malicioso pueda ejecutarse antes de que el sistema operativo inicie completamente.
+
+Esto ayuda a proteger el sistema contra amenazas como:
+
+- bootkits
+- rootkits
+- malware persistente de bajo nivel
 
 ## Conclusión general

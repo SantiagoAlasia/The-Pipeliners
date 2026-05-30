@@ -13,6 +13,8 @@ static dev_t dev_num;
 static struct cdev tp_cdev;
 static struct class *tp_class;
 
+static int sensor_actual = 1;
+
 // Operaciones
 static ssize_t my_read(struct file *file,
                        char __user *buffer,
@@ -41,6 +43,39 @@ static ssize_t my_read(struct file *file,
     return msg_len;
 }
 
+static ssize_t my_write(struct file *file,
+                        const char __user *buffer,
+                        size_t len,
+                        loff_t *offset)
+{
+    char kbuffer[10];
+
+    if (len > sizeof(kbuffer) - 1)
+        len = sizeof(kbuffer) - 1;
+
+    if (copy_from_user(kbuffer, buffer, len))
+        return -EFAULT;
+
+    kbuffer[len] = '\0';
+
+    if (kbuffer[0] == '1')
+    {
+        sensor_actual = 1;
+        printk(KERN_INFO "tp_driver: sensor seleccionado = 1\n");
+    }
+    else if (kbuffer[0] == '2')
+    {
+        sensor_actual = 2;
+        printk(KERN_INFO "tp_driver: sensor seleccionado = 2\n");
+    }
+    else
+    {
+        printk(KERN_INFO "tp_driver: valor invalido recibido\n");
+    }
+
+    return len;
+}
+
 static int my_open(struct inode *inode, struct file *file)
 {
     printk(KERN_INFO "tp_driver: dispositivo abierto\n");
@@ -59,6 +94,7 @@ static struct file_operations fops = {
     .open = my_open,
     .release = my_release,
     .read = my_read,
+    .write = my_write,
 };
 
 // Init del modulo

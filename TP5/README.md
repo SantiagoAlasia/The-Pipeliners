@@ -170,8 +170,19 @@ Además, se implementó el manejo del offset de lectura para evitar lecturas inf
   <em>Figura 5: Mensajes del kernel que muestran la carga del módulo, la creación del Character Device Driver y la ejecución de las operaciones open, read y release.</em>
 </div>
 
+**Implementación de la operación write()**
 
+Con el objetivo de permitir que una aplicación de usuario envíe comandos al driver, se implementó la operación `write()` dentro de la estructura `file_operations`.
 
+La transferencia de datos desde espacio de usuario hacia espacio de kernel se realizó mediante la función `copy_from_user()`, la cual permite copiar información de forma segura desde un buffer perteneciente a una aplicación hacia memoria del kernel.
 
+En esta etapa se incorporó una variable interna denominada `sensor_actual`, utilizada para almacenar la señal seleccionada por el usuario. Mediante comandos de escritura sobre el archivo `/dev/tp_driver`, el driver puede recibir el identificador del sensor que deberá utilizar en futuras lecturas.
+
+Esta funcionalidad constituye la base del mecanismo requerido por la consigna para permitir que la aplicación de usuario seleccione cuál de las señales disponibles desea visualizar.
+
+<div align="center">
+  <img src="img/Cap6.png"><br>
+  <em>Figura 6: Escritura de comandos sobre /dev/tp_driver para seleccionar la señal a utilizar por el driver.</em>
+</div>
 
 ## Conclusión general

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>TP5 -SdC</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Monitor de Señales</h1>
+
+        <div class="controls">
+
+            <label for="signalSelect">
+                Seleccionar señal:
+            </label>
+
+            <select id="signalSelect">
+                <option value="1">Señal 1</option>
+                <option value="2">Señal 2</option>
+            </select>
+
+        </div>
+
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+
+    </div>
+
+    <script>
+
+        const ctx = document.getElementById('chart');
+
+        const chart = new Chart(ctx, {
+
+            type: 'line',
+
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Señal",
+                    data: [],
+                    tension: 0.3
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#e0e0e0'
+                        }
+                    }
+                },
+
+                scales: {
+
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo (s)',
+                            color: '#e0e0e0'
+                        },
+
+                        ticks: {
+                            color: '#e0e0e0'
+                        },
+
+                        grid: {
+                            color: '#333'
+                        }
+                    },
+
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Valor',
+                            color: '#e0e0e0'
+                        },
+
+                        ticks: {
+                            color: '#e0e0e0'
+                        },
+
+                        grid: {
+                            color: '#333'
+                        }
+                    }
+                }
+            }
+        });
+
+        async function updateGraph() {
+
+            const response = await fetch('/data');
+            const data = await response.json();
+
+            chart.data.labels =
+                [...Array(data.samples.length).keys()];
+
+            chart.data.datasets[0].data =
+                data.samples;
+
+            chart.data.datasets[0].label =
+                data.signal === 1
+                ? "Señal 1"
+                : "Señal 2";
+
+            chart.update();
+        }
+
+        setInterval(updateGraph, 1000);
+
+        document
+            .getElementById("signalSelect")
+            .addEventListener("change", async function () {
+
+                await fetch('/signal', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        signal: parseInt(this.value)
+                    })
+                });
+
+                chart.data.labels = [];
+                chart.data.datasets[0].data = [];
+
+                chart.update();
+            });
+
+    </script>
+
+</body>
+
+</html>

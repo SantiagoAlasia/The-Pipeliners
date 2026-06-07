@@ -248,14 +248,14 @@ En las siguientes figuras podemos ver como quedo la interfaz web para cada una d
 
 <div align="center">
   <img src="img/Cap10.png"><br>
-  <em>*Figura 7. Ventana correspondiente a la señal 1*</em>
+  <em>Figura 7. Ventana correspondiente a la señal 1</em>
 </div>
 
 #### Señal 2
 
 <div align="center">
   <img src="img/Cap11.png"><br>
-  <em>*Figura 8.Ventana correspondiente a la Señal 2.*</em>
+  <em>Figura 8.Ventana correspondiente a la Señal 2.</em>
 </div>
 
 
@@ -274,14 +274,14 @@ La forma temporal de las señales generadas se muestra a continuación:
 
 <div align="center">
   <img src="img/Señal1.drawio.png"><br>
-  <em>*Figura 9. Forma de onda correspondiente a la Señal 1.*</em>
+  <em>Figura 9. Forma de onda correspondiente a la Señal 1.</em>
 </div>
 
 #### Señal 2
 
 <div align="center">
   <img src="img/Señal2.drawio.png"><br>
-  <em>*Figura 10. Forma de onda correspondiente a la Señal 2.*</em>
+  <em>Figura 10. Forma de onda correspondiente a la Señal 2.</em>
 </div>
 
 Gracias a este banco de pruebas fue posible verificar el funcionamiento integral del sistema, desde la captura de datos en los GPIO, pasando por la comunicación entre el espacio de kernel y el espacio de usuario, hasta la correcta representación gráfica de las señales en la interfaz web.
@@ -306,7 +306,23 @@ La utilización de estos scripts permitió reducir significativamente el tiempo 
 
 ## Resultados Obtenidos
 
-1. *Compilación y envio*: 
+1. *Conexion del sistema*:
+
+En la *Figura 11* podemos ver el conexionado fisico utilizado. Podemos observar los sigueintes elementos:
+- Raspberrry PI Modelo 3B.
+- Fuente de alimentacion de 5v.
+- Arduino UNO.
+- 2 Divisores resistivos con resistencias de 3.3k y 6.8k.
+
+> Obs: El circuito con resistencias no es más que dos divisores resistivos para convertir la salida del arduino de **5v** a **3.3v**.
+
+<div align="center">
+  <img src="img/Cap15.jpeg"><br>
+  <em>Figura 11. Conexión de la Raspberry PI con el arduino UNO</em>
+</div>
+
+
+2. *Compilación y envio*: 
 
 ```
 # Limpieza de la compilación anterior
@@ -318,10 +334,10 @@ make deploy
 
 <div align="center">
   <img src="img/Cap7.png"><br>
-  <em>*Figura 11. Terminal PC Host, compilación y envio*</em>
+  <em>Figura 12. Terminal PC Host, compilación y envio</em>
 </div>
 
-2. *Verificación de recibo*:
+3. *Verificación de recibo*:
 
 ```
 # Nos movemos a la carpeta destino
@@ -333,10 +349,10 @@ ls
 
 <div align="center">
   <img src="img/Cap8.png"><br>
-  <em>*Figura 12. Terminal Raspberry Pi, verificación*</em>
+  <em>Figura 13. Terminal Raspberry Pi, verificación</em>
 </div>
 
-3. *Inserción del modulo y Despliegue de la app*
+4. *Inserción del modulo y Despliegue de la app*
 
 ```
 # Nos ubicamos en la carpeta del proyecto
@@ -353,15 +369,15 @@ lsmod | grep gpio_driver
 
 <div align="center">
   <img src="img/Cap9.png"><br>
-  <em>*Figura 13. Terminal Raspberry Pi, deploy*</em>
+  <em>Figura 14. Terminal Raspberry Pi, deploy</em>
 </div>
 
 <div align="center">
   <img src="img/Cap12.png"><br>
-  <em>*Figura 13. Terminal Raspberry Pi, verificación modulo insertado*</em>
+  <em>Figura 15. Terminal Raspberry Pi, verificación modulo insertado</em>
 </div>
 
-4. *Eliminacion del Modulo y limpieza*
+5. *Eliminacion del Modulo y limpieza*
 
 ```
 # Lanzamos el script de limpieza y verificamos que el modulo se haya descargado
@@ -372,12 +388,12 @@ lsmod | grep gpio_driver
 
 <div align="center">
   <img src="img/Cap13.png"><br>
-  <em>*Figura 14. Terminal Raspberry Pi, undeploy*</em>
+  <em>Figura 16. Terminal Raspberry Pi, undeploy</em>
 </div>
 
 <div align="center">
   <img src="img/Cap14.png"><br>
-  <em>*Figura 15. Terminal Raspberry Pi, verificación modulo eliminado*</em>
+  <em>Figura 17. Terminal Raspberry Pi, verificación modulo eliminado</em>
 </div>
 
 ## Conclusión general

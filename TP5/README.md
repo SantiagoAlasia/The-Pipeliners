@@ -212,12 +212,77 @@ Por otro lado, el script `undeploy.sh` realiza el proceso inverso, liberando tod
 La utilización de estos scripts permitió reducir significativamente el tiempo necesario para iniciar y finalizar las pruebas, además de garantizar que todos los integrantes del grupo ejecutaran exactamente la misma secuencia de pasos. Esto mejoró la reproducibilidad de los ensayos, facilitó las tareas de depuración y minimizó errores humanos asociados a la configuración manual del sistema.
 
 ## Resultados Obtenidos
+---
 
+1. *Compilación y envio*: 
 
+```
+# Limpieza de la compilación anterior
+make clean
+
+# Compila y envia el .ko a la raspberry pi
+make deploy 
+```
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura X. *</em>
+</div>
+
+2. *Verificación de recibo*:
+
+```
+# Nos movemos a la carpeta destino
+cd TP5-SdC/CDD/
+
+# Revisamos que se encuentre el archivo .ko
+ls
+```
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura X. *</em>
+</div>
+
+3. *Inserción del modulo y Despliegue de la app*
+
+```
+# Nos ubicamos en la carpeta del proyecto
+cd ..
+
+# Lanzamos el script de bash que creamos
+./deploy.sh
+
+# Si accedemos desde el navegador a la ip y puerto seleccionado vamos a ver nuestra sistema funcionando. 
+
+# Tambien podemos revisar el log de eventos y chequear el estado de nuestro modulo
+dmesg | grep gpio_driver
+```
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura X. *</em>
+</div>
+
+4. *Eliminacion del Modulo y limpieza*
+
+```
+# Lanzamos el script de limpieza y verificamos que el modulo se haya descargado
+./undeploy.sh
+
+lsmod | grep gpio_driver
+```
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura X. *</em>
+</div>
 
 ## Conclusión general
+---
 
 ## Bibliografia Consultada
+---
 
 - Implementation of Linux GPIO Device Driver on Raspberry Pi Platform - Vu Nguyen.
 - Linux Driver Development with Raspberry Pi.

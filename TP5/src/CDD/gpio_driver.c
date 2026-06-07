@@ -139,7 +139,7 @@ static int gpio_probe(struct platform_device *pdev)
     if (IS_ERR(my_device)) goto Error_Class;
 
     timer_setup(&mi_timer, mi_timer_callback, 0);
-    mod_timer(&mi_timer, jiffies + msecs_to_jiffies(1000));
+    mod_timer(&mi_timer, jiffies + msecs_to_jiffies(50));
 
     printk(KERN_INFO "gpio_driver: Pines mapeados y driver activo.\n");
     return 0;

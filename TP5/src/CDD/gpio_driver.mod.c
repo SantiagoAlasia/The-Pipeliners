@@ -49,4 +49,4 @@ MODULE_INFO(depends, "");
 MODULE_ALIAS("of:N*T*Cthe-pipeliners,gpio-driver");
 MODULE_ALIAS("of:N*T*Cthe-pipeliners,gpio-driverC*");
 
-MODULE_INFO(srcversion, "8B0E5C6325756124B6ECB03");
+MODULE_INFO(srcversion, "F454391F91E782C61C6B1CB");

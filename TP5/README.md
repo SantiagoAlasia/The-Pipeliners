@@ -273,14 +273,14 @@ La forma temporal de las señales generadas se muestra a continuación:
 #### Señal 1
 
 <div align="center">
-  <img src=""><br>
+  <img src="img/Señal1.drawio.png"><br>
   <em>*Figura 9. Forma de onda correspondiente a la Señal 1.*</em>
 </div>
 
 #### Señal 2
 
 <div align="center">
-  <img src=""><br>
+  <img src="img/Señal2.drawio.png"><br>
   <em>*Figura 10. Forma de onda correspondiente a la Señal 2.*</em>
 </div>
 
@@ -305,7 +305,6 @@ Por otro lado, el script `undeploy.sh` realiza el proceso inverso, liberando tod
 La utilización de estos scripts permitió reducir significativamente el tiempo necesario para iniciar y finalizar las pruebas, además de garantizar que todos los integrantes del grupo ejecutaran exactamente la misma secuencia de pasos. Esto mejoró la reproducibilidad de los ensayos, facilitó las tareas de depuración y minimizó errores humanos asociados a la configuración manual del sistema.
 
 ## Resultados Obtenidos
----
 
 1. *Compilación y envio*: 
 

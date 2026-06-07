@@ -36,14 +36,14 @@ Diseñar e implementar un Controlador de Dispositivo de Caracteres (CDD) para Li
 ## Desarrollo
 
 ### Creación del primer módulo del kernel
----
+--- 
 
 Como primera aproximación al desarrollo de drivers Linux, se implementó un módulo básico del kernel escrito en lenguaje C.
 
 El módulo implementa dos funciones principales:
 
-- Una función de inicialización ejecutada al cargar el módulo mediante `insmod`.
-- Una función de salida ejecutada al remover el módulo mediante `rmmod`.
+- Una función de inicialización ejecutada al cargar el módulo mediante insmod.
+- Una función de salida ejecutada al remover el módulo mediante rmmod.
 
 Estas funciones se registran utilizando las macros module_init() y module_exit(), las cuales forman parte de la infraestructura estándar para módulos Linux.
 
@@ -53,9 +53,22 @@ Además, se utilizó la función printk() para registrar mensajes en el log del 
 
 La compilación del módulo se realizó utilizando el sistema de build provisto por el kernel Linux mediante un archivo `Makefile`.
 
-```
+El archivo Makefile utilizado fue:
+
+obj-m += tp_driver.o
+
+all:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+
+La directiva `obj-m` indica que el archivo `tp_driver.c` debe compilarse como un módulo del kernel.
+
+La compilación se ejecutó mediante:
+
 make
-```
+
 Como resultado, el sistema generó el archivo `tp_driver.ko`, correspondiente al módulo compilado listo para ser cargado dinámicamente en el kernel Linux.
 
 <div align="center">
@@ -63,25 +76,19 @@ Como resultado, el sistema generó el archivo `tp_driver.ko`, correspondiente al
   <em>Figura 1: Compilación exitosa del módulo del kernel y generación del archivo tp_driver.ko.</em>
 </div>
 
-**Inserción y Verificacion del módulo**
+**Inserción del módulo**
 
 Una vez compilado el módulo, se procedió a cargarlo dinámicamente en el kernel utilizando el comando:
 
-```
 sudo insmod tp_driver.ko
-```
 
 La correcta inserción del módulo se verificó mediante:
 
-```
 lsmod | grep tp_driver
-```
 
 Posteriormente, el módulo fue removido utilizando:
 
-```
 sudo rmmod tp_driver
-```
 
 Este procedimiento permitió validar el correcto funcionamiento de las funciones de inicialización y salida implementadas en el módulo.
 
@@ -94,11 +101,9 @@ Este procedimiento permitió validar el correcto funcionamiento de las funciones
 
 Los mensajes generados por el módulo fueron verificados mediante el comando:
 
-```
 sudo dmesg | tail
-```
 
-A través de este mecanismo fue posible observar los mensajes emitidos por `printk()` durante la carga y descarga del módulo.
+A través de este mecanismo fue posible observar los mensajes emitidos por printk() durante la carga y descarga del módulo.
 
 Esto permitió confirmar la correcta ejecución de las funciones del módulo dentro del espacio de kernel.
 
@@ -107,7 +112,95 @@ Esto permitió confirmar la correcta ejecución de las funciones del módulo den
   <em>Figura 3: Mensajes del kernel generados durante la carga y descarga del módulo.</em>
 </div>
 
-### Implementación del CDD
+**Implementación del Character Device Driver**
+
+Luego de validar el funcionamiento básico de un módulo del kernel, se avanzó en la implementación de un Character Device Driver (CDD).
+
+Para ello, se incorporó el registro dinámico de números major y minor mediante la función:
+
+alloc_chrdev_region()
+
+Esto permitió que el kernel identificara el dispositivo de caracteres implementado.
+
+Posteriormente, se definió una estructura `file_operations`, utilizada para asociar las operaciones del sistema de archivos con las funciones implementadas por el driver. En esta etapa se incorporaron las operaciones:
+
+- `open`
+- `read`
+- `release`
+
+La estructura utilizada fue:
+
+static struct file_operations fops = {
+    .owner = THIS_MODULE,
+    .open = my_open,
+    .read = my_read,
+    .release = my_release,
+};
+
+Además, se utilizó la estructura `cdev` para registrar el dispositivo dentro del kernel mediante:
+
+cdev_init()
+cdev_add()
+
+Finalmente, se creó automáticamente el archivo de dispositivo dentro del directorio `/dev` utilizando:
+
+class_create()
+device_create()
+
+Como resultado, el sistema generó el archivo:
+
+/dev/tp_driver
+
+permitiendo la interacción entre espacio de usuario y espacio de kernel mediante operaciones estándar de lectura.
+
+**Implementación de la operación read()**
+
+Se implementó la operación `read()` del driver con el objetivo de transferir información desde el espacio de kernel hacia el espacio de usuario.
+
+Para realizar esta transferencia se utilizó la función:
+
+copy_to_user()
+
+la cual permite copiar datos de manera segura desde memoria del kernel hacia un buffer perteneciente a una aplicación de usuario.
+
+La función implementada devuelve inicialmente un mensaje de prueba:
+
+Hola desde kernel space
+
+La operación fue validada mediante el comando:
+
+sudo cat /dev/tp_driver
+
+obteniéndose correctamente el mensaje enviado desde el driver.
+
+Además, se implementó el manejo del offset de lectura para evitar lecturas infinitas al utilizar herramientas como `cat`.
+
+<div align="center">
+  <img src="img/Cap4.png"><br>
+  <em>Figura 4: Lectura exitosa desde el Character Device Driver mediante /dev/tp_driver.</em>
+</div>
+
+<div align="center">
+  <img src="img/Cap5.png"><br>
+  <em>Figura 5: Mensajes del kernel que muestran la carga del módulo, la creación del Character Device Driver y la ejecución de las operaciones open, read y release.</em>
+</div>
+
+**Implementación de la operación write()**
+
+Con el objetivo de permitir que una aplicación de usuario envíe comandos al driver, se implementó la operación `write()` dentro de la estructura `file_operations`.
+
+La transferencia de datos desde espacio de usuario hacia espacio de kernel se realizó mediante la función `copy_from_user()`, la cual permite copiar información de forma segura desde un buffer perteneciente a una aplicación hacia memoria del kernel.
+
+En esta etapa se incorporó una variable interna denominada `sensor_actual`, utilizada para almacenar la señal seleccionada por el usuario. Mediante comandos de escritura sobre el archivo `/dev/tp_driver`, el driver puede recibir el identificador del sensor que deberá utilizar en futuras lecturas.
+
+Esta funcionalidad constituye la base del mecanismo requerido por la consigna para permitir que la aplicación de usuario seleccione cuál de las señales disponibles desea visualizar.
+
+<div align="center">
+  <img src="img/Cap6.png"><br>
+  <em>Figura 6: Escritura de comandos sobre /dev/tp_driver para seleccionar la señal a utilizar por el driver.</em>
+</div>
+
+### Implementación del CDD con GPIO y Timer
 ---
 
 Tras validar el correcto funcionamiento de un módulo básico de pruebas en el espacio de kernel, se procedió al diseño y desarrollo del driver definitivo. Sin embargo, como instancia previa a la programación del hardware, resultó nesesario preparar el entorno de **desarrollo cruzado** para garantizar un flujo de trabajo eficiente.
@@ -154,15 +247,15 @@ En las siguientes figuras podemos ver como quedo la interfaz web para cada una d
 #### Señal 1
 
 <div align="center">
-  <img src=""><br>
-  <em>*Figura X. Ventana correspondiente a la señal 1*</em>
+  <img src="img/Cap10.png"><br>
+  <em>*Figura 7. Ventana correspondiente a la señal 1*</em>
 </div>
 
 #### Señal 2
 
 <div align="center">
-  <img src=""><br>
-  <em>*Figura Y.Ventana correspondiente a la Señal 2.*</em>
+  <img src="img/Cap11.png"><br>
+  <em>*Figura 8.Ventana correspondiente a la Señal 2.*</em>
 </div>
 
 
@@ -181,14 +274,14 @@ La forma temporal de las señales generadas se muestra a continuación:
 
 <div align="center">
   <img src=""><br>
-  <em>*Figura X. Forma de onda correspondiente a la Señal 1.*</em>
+  <em>*Figura 9. Forma de onda correspondiente a la Señal 1.*</em>
 </div>
 
 #### Señal 2
 
 <div align="center">
   <img src=""><br>
-  <em>*Figura Y. Forma de onda correspondiente a la Señal 2.*</em>
+  <em>*Figura 10. Forma de onda correspondiente a la Señal 2.*</em>
 </div>
 
 Gracias a este banco de pruebas fue posible verificar el funcionamiento integral del sistema, desde la captura de datos en los GPIO, pasando por la comunicación entre el espacio de kernel y el espacio de usuario, hasta la correcta representación gráfica de las señales en la interfaz web.
@@ -225,8 +318,8 @@ make deploy
 ```
 
 <div align="center">
-  <img src=""><br>
-  <em>*Figura X. *</em>
+  <img src="img/Cap7.png"><br>
+  <em>*Figura 11. Terminal PC Host, compilación y envio*</em>
 </div>
 
 2. *Verificación de recibo*:
@@ -240,8 +333,8 @@ ls
 ```
 
 <div align="center">
-  <img src=""><br>
-  <em>*Figura X. *</em>
+  <img src="img/Cap8.png"><br>
+  <em>*Figura 12. Terminal Raspberry Pi, verificación*</em>
 </div>
 
 3. *Inserción del modulo y Despliegue de la app*
@@ -256,12 +349,17 @@ cd ..
 # Si accedemos desde el navegador a la ip y puerto seleccionado vamos a ver nuestra sistema funcionando. 
 
 # Tambien podemos revisar el log de eventos y chequear el estado de nuestro modulo
-dmesg | grep gpio_driver
+lsmod | grep gpio_driver
 ```
 
 <div align="center">
-  <img src=""><br>
-  <em>*Figura X. *</em>
+  <img src="img/Cap9.png"><br>
+  <em>*Figura 13. Terminal Raspberry Pi, deploy*</em>
+</div>
+
+<div align="center">
+  <img src="img/Cap12.png"><br>
+  <em>*Figura 13. Terminal Raspberry Pi, verificación modulo insertado*</em>
 </div>
 
 4. *Eliminacion del Modulo y limpieza*
@@ -274,12 +372,16 @@ lsmod | grep gpio_driver
 ```
 
 <div align="center">
-  <img src=""><br>
-  <em>*Figura X. *</em>
+  <img src="img/Cap13.png"><br>
+  <em>*Figura 14. Terminal Raspberry Pi, undeploy*</em>
+</div>
+
+<div align="center">
+  <img src="img/Cap14.png"><br>
+  <em>*Figura 15. Terminal Raspberry Pi, verificación modulo eliminado*</em>
 </div>
 
 ## Conclusión general
----
 
 El desarrollo e implementación de este sistema de adquisición permitió validar de manera práctica los conceptos de comunicación entre el **espacio de kernel** y el **espacio de usuario** bajo el sistema operativo Linux. Este diseño garantizó un acceso seguro, aislado y eficiente al hardware de la Raspberry Pi, evitando los riesgos de colisiones de memoria o bloqueos de pines comunes en las metodologías legadas.
 
@@ -288,7 +390,6 @@ Asimismo, la integración de un servidor intermedio en Python junto con un front
 En conclusión, el proyecto cumple con los objetivos de estabilidad, modularidad y rendimiento definidos al principio del trabajo.
 
 ## Bibliografia Consultada
----
 
 - Implementation of Linux GPIO Device Driver on Raspberry Pi Platform - Vu Nguyen.
 - Linux Driver Development with Raspberry Pi.

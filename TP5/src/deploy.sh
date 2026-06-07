@@ -5,7 +5,7 @@ DRIVER_DIR="CDD"
 MODULE_NAME="gpio_driver"
 OVERLAY_NAME="my_overlay"
 
-echo "=?================================================="
+echo "==================================================="
 echo "Iniciando despliegue global del TP (The-Pipeliners)"
 echo "==================================================="
 

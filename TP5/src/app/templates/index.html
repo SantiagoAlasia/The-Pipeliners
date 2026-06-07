@@ -3,153 +3,130 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <title>TP5 -SdC</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP5 - Analizador Lógico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
     <div class="container">
-
-        <h1>Monitor de Señales</h1>
-
-        <div class="controls">
-
-            <label for="signalSelect">
-                Seleccionar señal:
-            </label>
-
-            <select id="signalSelect">
-                <option value="1">Señal 1</option>
-                <option value="2">Señal 2</option>
-            </select>
-
+        <div class="card">
+            <h1>Analizador de Señales Digitales</h1>
+            <div class="controls">
+                <label for="signalSelect">Canal de Monitoreo:</label>
+                <select id="signalSelect">
+                    <option value="1">Señal 1</option>
+                    <option value="2">Señal 2</option>
+                </select>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
         </div>
-
-        <div class="chart-container">
-            <canvas id="chart"></canvas>
-        </div>
-
     </div>
 
     <script>
-
+        const Ts = 0.05; // 20 Hz -> 50ms por muestra
+      
+        const muestrasVisibles = 60; 
         const ctx = document.getElementById('chart');
 
+        const etiquetasFijas = Array.from(
+            { length: muestrasVisibles },
+            (_, i) => {
+                const tiempo = (i - muestrasVisibles + 1) * Ts;
+                return tiempo === 0 ? "Ahora" : `${tiempo.toFixed(1)}s`;
+            }
+        );
+
         const chart = new Chart(ctx, {
-
             type: 'line',
-
             data: {
-                labels: [],
+                labels: etiquetasFijas,
                 datasets: [{
-                    label: "Señal",
-                    data: [],
-                    tension: 0.3
+                    label: "Señal 1",
+                    data: Array(muestrasVisibles).fill(0),
+                    stepped: true,
+                    tension: 0,
+                    borderColor: '#00ff88',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    fill: false
                 }]
             },
-
             options: {
-
                 responsive: true,
                 maintainAspectRatio: false,
-
+                animation: false, 
                 plugins: {
-                    legend: {
-                        labels: {
-                            color: '#e0e0e0'
-                        }
-                    }
+                    legend: { labels: { color: '#f5f5f5' } }
                 },
-
                 scales: {
-
                     x: {
-                        title: {
-                            display: true,
-                            text: 'Tiempo (s)',
-                            color: '#e0e0e0'
-                        },
-
+                        title: { display: true, text: 'Ventana de Tiempo Relativa (3 Segundos)', color: '#f5f5f5' },
                         ticks: {
-                            color: '#e0e0e0'
+                            color: '#cfcfcf',
+                            maxTicksLimit: 7 
                         },
-
-                        grid: {
-                            color: '#333'
-                        }
+                        grid: { color: 'rgba(255,255,255,0.05)' }
                     },
-
                     y: {
-                        title: {
-                            display: true,
-                            text: 'Valor',
-                            color: '#e0e0e0'
-                        },
-
+                        min: -0.1,
+                        max: 1.1,
+                        title: { display: true, text: 'Estado Lógico', color: '#f5f5f5' },
                         ticks: {
-                            color: '#e0e0e0'
+                            stepSize: 1,
+                            color: '#cfcfcf',
+                            callback: function(value) {
+                                if (value === 0) return '0 (LOW)';
+                                if (value === 1) return '1 (HIGH)';
+                                return '';
+                            }
                         },
-
-                        grid: {
-                            color: '#333'
-                        }
+                        grid: { color: 'rgba(255,255,255,0.08)' }
                     }
                 }
             }
         });
 
         async function updateGraph() {
+            try {
+                const response = await fetch('/data');
+                const data = await response.json();
 
-            const response = await fetch('/data');
-            const data = await response.json();
+                // Recortamos exactamente las últimas 60 muestras
+                let datosPayload = data.samples.slice(-muestrasVisibles);
 
-            chart.data.labels =
-                [...Array(data.samples.length).keys()];
+                // Relleno preventivo al iniciar el script
+                while (datosPayload.length < muestrasVisibles) {
+                    datosPayload.unshift(0);
+                }
 
-            chart.data.datasets[0].data =
-                data.samples;
-
-            chart.data.datasets[0].label =
-                data.signal === 1
-                ? "Señal 1"
-                : "Señal 2";
-
-            chart.update();
-        }
-
-        setInterval(updateGraph, 1000);
-
-        document
-            .getElementById("signalSelect")
-            .addEventListener("change", async function () {
-
-                await fetch('/signal', {
-
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-
-                    body: JSON.stringify({
-                        signal: parseInt(this.value)
-                    })
-                });
-
-                chart.data.labels = [];
-                chart.data.datasets[0].data = [];
+                chart.data.datasets[0].data = datosPayload;
+                chart.data.datasets[0].label = data.signal === 1 ? "Señal 1" : "Señal 2";
 
                 chart.update();
+            } catch (error) {
+                console.error("Error actualizando gráfico:", error);
+            }
+        }
+
+        setInterval(updateGraph, 150);
+
+        document.getElementById("signalSelect").addEventListener("change", async function () {
+            await fetch('/signal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ signal: parseInt(this.value) })
             });
+            chart.data.datasets[0].data = Array(muestrasVisibles).fill(0);
+            chart.update();
+        });
 
+        updateGraph();
     </script>
-
 </body>
-
 </html>

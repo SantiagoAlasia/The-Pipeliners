@@ -106,4 +106,21 @@ Esto permitió confirmar la correcta ejecución de las funciones del módulo den
   <em>Figura 3: Mensajes del kernel generados durante la carga y descarga del módulo.</em>
 </div>
 
+### Automatización del proceso de carga y descarga del sistema completo
+
+Durante la etapa de desarrollo y pruebas fue necesario cargar y descargar repetidamente todos los componentes del sistema, incluyendo el Device Tree Overlay, el módulo del kernel y la aplicación de usuario. Con el objetivo de simplificar este procedimiento, se desarrollaron dos scripts en Bash que automatizan completamente el despliegue y la desinstalación del sistema: `deploy.sh` y `undeploy.sh`.
+
+El script `deploy.sh` se encarga de preparar el entorno de ejecución realizando de manera secuencial las siguientes tareas:
+
+- Eliminar posibles configuraciones residuales provenientes de ejecuciones anteriores.
+- Cargar el Device Tree Overlay (`my_overlay.dtbo`) para habilitar la configuración de hardware necesaria.
+- Insertar el módulo del kernel (`gpio_driver.ko`) mediante `insmod`.
+- Ajustar los permisos del archivo de dispositivo `/dev/gpio_driver`, permitiendo que la aplicación de usuario pueda acceder al controlador sin restricciones adicionales.
+- Activar automáticamente el entorno virtual de Python utilizado por la aplicación.
+- Iniciar la aplicación de usuario (`app.py`), responsable de la adquisición y visualización de datos.
+
+Por otro lado, el script `undeploy.sh` realiza el proceso inverso, liberando todos los recursos utilizados por el sistema. Entre sus funciones se encuentran la descarga del módulo del kernel y la eliminación de las configuraciones aplicadas durante el despliegue.
+
+La utilización de estos scripts permitió reducir significativamente el tiempo necesario para iniciar y finalizar las pruebas, además de garantizar que todos los integrantes del grupo ejecutaran exactamente la misma secuencia de pasos. Esto mejoró la reproducibilidad de los ensayos, facilitó las tareas de depuración y minimizó errores humanos asociados a la configuración manual del sistema.
+
 ## Conclusión general

@@ -36,6 +36,7 @@ Diseñar e implementar un Controlador de Dispositivo de Caracteres (CDD) para Li
 ## Desarrollo
 
 ### Creación del primer módulo del kernel
+---
 
 Como primera aproximación al desarrollo de drivers Linux, se implementó un módulo básico del kernel escrito en lenguaje C.
 
@@ -106,7 +107,29 @@ Esto permitió confirmar la correcta ejecución de las funciones del módulo den
   <em>Figura 3: Mensajes del kernel generados durante la carga y descarga del módulo.</em>
 </div>
 
+### Implementación del CDD
+---
+
+Tras validar el correcto funcionamiento de un módulo básico de pruebas en el espacio de kernel, se procedió al diseño y desarrollo del driver definitivo. Sin embargo, como instancia previa a la programación del hardware, resultó nesesario preparar el entorno de **desarrollo cruzado** para garantizar un flujo de trabajo eficiente.
+
+**Proceso de Compilación Cruzada (Cross-Compilación)**
+
+Para la construcción del módulo de kernel se implementó un flujo de compilación cruzada (cross-compilación). Este proceso consiste en utilizar una máquina anfitriona (Host con arquitectura x86_64) con alta capacidad de procesamiento para generar un binario ejecutable final destinado a una arquitectura de hardware completamente diferente (Target con arquitectura ARM64 de 64 bits).
+
+Para que la **cross-compilación** fuera exitosa, se procedió a configurar un entorno de desarrollo integrado que coordinó tres variables esenciales a través del sistema de construcción de Linux (Kbuild). En primer lugar, se instaló y declaró el toolchain específico mediante la bandera `CROSS_COMPILE=aarch64-linux-gnu-`, forzando al sistema a invocar las herramientas de traducción de instrucciones para `ARM64`. En segundo lugar, se configuró la variable `ARCH=arm64` para empaquetar el módulo bajo las reglas de dicha arquitectura. Finalmente, el Makefile se enlazó de forma directa con las cabeceras y el código fuente clonado de la versión exacta del núcleo de la placa destino (rama `Linux Raspberry Pi 6.1.8`), garantizando que las estructuras de datos y macros del kernel coincidan al momento de la inserción dinámica con `insmod`.
+
+**Implementación de Arquitectura GPIO Moderna (gpiod)**
+
+La vinculación del hardware no se realiza de forma estática en el código de C, sino que se delega al Device Tree Overlay (gpio_overlay.dts). Este archivo define un nodo compatible con la firma "the-pipeliners,gpio-driver", reservando los pines físicos GPIO 20 y GPIO 21 bajo los alias lógicos "sensor1" y "sensor2". Cuando el kernel detecta la carga de este overlay, dispara la función de inicialización `probe` del driver de plataforma. Dentro de esta rutina, el módulo utiliza la API segura `devm_gpiod_get()` para solicitar los descriptores de las líneas configuradas como entradas (GPIOD_IN). Este enfoque no solo blinda el acceso al hardware aislando los pines de otros procesos, sino que permite conmutar de forma segura entre canales en tiempo de ejecución escribiendo un carácter ('1' o '2') en `/dev/gpio_driver`.
+
+**Muestreo Periódico Mediante Temporizadores de Kernel (Timers)**
+
+Para recolectar el nivel lógico de los sensores sin usar un **polling** continuo que degradaría críticamente el rendimiento del sistema operativo, se implementó un timer del kernel mediante la estructura struct `timer_list`.
+
+Durante la fase de inicialización (`probe`), el driver configura y acopla este temporizador interno a una función de `callback` dedicada encargada de realizar la lectura física del hardware de forma automatizada. El temporizador se calibra utilizando la variable del sistema `jiffies` para dispararse con una periodicidad controlada. Cada vez que expira el ciclo de tiempo establecido, la función `callback` interroga al descriptor GPIO activo mediante la llamada no bloqueante `gpiod_get_value()`, guarda el estado digital en una variable global segura para su posterior lectura desde el espacio de usuario (`copy_to_user`), y vuelve a programar el temporizador de manera recursiva empleando la macro `mod_timer()`. Este diseño asincrónico asegura un muestreo predecible, determinista y de bajo impacto para el planificador de tareas de Linux.
+
 ### Desarrollo de la Interfaz Web
+---
 
 La capa de aplicación fue diseñada siguiendo una arquitectura que separa claramente la adquisición de datos de la lógica de visualización. El componente principal de esta capa es el archivo `app.py`, encargado de actuar como intermediario entre el driver de caracteres y la interfaz web. Su funcionamiento se divide en dos responsabilidades fundamentales:
 
@@ -126,7 +149,25 @@ El gráfico utiliza un eje temporal fijo que muestra una ventana con referencias
 
 La aplicación actualiza periódicamente el gráfico utilizando las muestras más recientes almacenadas en el búfer. De esta manera, la señal se desplaza de forma continua a lo largo de la pantalla, permitiendo observar su evolución en tiempo real sin necesidad de realizar desplazamientos manuales. Además, cuando el usuario selecciona una señal diferente, la visualización se reinicia automáticamente para evitar mezclar datos pertenecientes a distintas fuentes y garantizar una representación coherente de la nueva medición.
 
+En las siguientes figuras podemos ver como quedo la interfaz web para cada una de las señales.
+
+#### Señal 1
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura X. Ventana correspondiente a la señal 1*</em>
+</div>
+
+#### Señal 2
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura Y.Ventana correspondiente a la Señal 2.*</em>
+</div>
+
+
 ### Creación de un generador de señales para testing
+---
 
 Con el objetivo de validar el correcto funcionamiento del controlador desarrollado y de la aplicación de visualización, se implementó un generador de señales utilizando una placa **Arduino UNO**. Este generador permite producir de forma controlada dos señales digitales periódicas independientes, las cuales son enviadas a los GPIO de la Raspberry Pi para su posterior adquisición por parte del driver.
 
@@ -153,6 +194,7 @@ La forma temporal de las señales generadas se muestra a continuación:
 Gracias a este banco de pruebas fue posible verificar el funcionamiento integral del sistema, desde la captura de datos en los GPIO, pasando por la comunicación entre el espacio de kernel y el espacio de usuario, hasta la correcta representación gráfica de las señales en la interfaz web.
 
 ### Automatización del proceso de carga y descarga del sistema completo
+---
 
 Durante la etapa de desarrollo y pruebas fue necesario cargar y descargar repetidamente todos los componentes del sistema, incluyendo el Device Tree Overlay, el módulo del kernel y la aplicación de usuario. Con el objetivo de simplificar este procedimiento, se desarrollaron dos scripts en Bash que automatizan completamente el despliegue y la desinstalación del sistema: `deploy.sh` y `undeploy.sh`.
 
@@ -169,4 +211,17 @@ Por otro lado, el script `undeploy.sh` realiza el proceso inverso, liberando tod
 
 La utilización de estos scripts permitió reducir significativamente el tiempo necesario para iniciar y finalizar las pruebas, además de garantizar que todos los integrantes del grupo ejecutaran exactamente la misma secuencia de pasos. Esto mejoró la reproducibilidad de los ensayos, facilitó las tareas de depuración y minimizó errores humanos asociados a la configuración manual del sistema.
 
+## Resultados Obtenidos
+
+
+
 ## Conclusión general
+
+## Bibliografia Consultada
+
+- Implementation of Linux GPIO Device Driver on Raspberry Pi Platform - Vu Nguyen.
+- Linux Driver Development with Raspberry Pi.
+- Material de la catedra.
+- Raspberry Pi Foundation, Linux Kernel Source Tree for Raspberry Pi. GitHub. Disponible en: https://github.com/raspberrypi/linux. 
+- Tutoriales de Johannes4Linux. Disponible en: https://github.com/Johannes4Linux/Linux_Driver_Tutorial
+- Kernel Device Tree.

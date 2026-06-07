@@ -33,4 +33,77 @@ Diseñar e implementar un Controlador de Dispositivo de Caracteres (CDD) para Li
 * Aplicar técnicas de compilación cruzada para generar binarios compatibles con la arquitectura ARM de la Raspberry Pi.
 * Validar el correcto funcionamiento del sistema completo mediante pruebas sobre hardware real.
 
+## Desarrollo
+
+### Creación del primer módulo del kernel
+
+Como primera aproximación al desarrollo de drivers Linux, se implementó un módulo básico del kernel escrito en lenguaje C.
+
+El módulo implementa dos funciones principales:
+
+- Una función de inicialización ejecutada al cargar el módulo mediante `insmod`.
+- Una función de salida ejecutada al remover el módulo mediante `rmmod`.
+
+Estas funciones se registran utilizando las macros module_init() y module_exit(), las cuales forman parte de la infraestructura estándar para módulos Linux.
+
+Además, se utilizó la función printk() para registrar mensajes en el log del kernel, permitiendo verificar el correcto funcionamiento del módulo mediante el comando dmesg.
+
+**Compilación del módulo**
+
+La compilación del módulo se realizó utilizando el sistema de build provisto por el kernel Linux mediante un archivo `Makefile`.
+
+```
+make
+```
+Como resultado, el sistema generó el archivo `tp_driver.ko`, correspondiente al módulo compilado listo para ser cargado dinámicamente en el kernel Linux.
+
+<div align="center">
+  <img src="img/Cap1.png"><br>
+  <em>Figura 1: Compilación exitosa del módulo del kernel y generación del archivo tp_driver.ko.</em>
+</div>
+
+**Inserción y Verificacion del módulo**
+
+Una vez compilado el módulo, se procedió a cargarlo dinámicamente en el kernel utilizando el comando:
+
+```
+sudo insmod tp_driver.ko
+```
+
+La correcta inserción del módulo se verificó mediante:
+
+```
+lsmod | grep tp_driver
+```
+
+Posteriormente, el módulo fue removido utilizando:
+
+```
+sudo rmmod tp_driver
+```
+
+Este procedimiento permitió validar el correcto funcionamiento de las funciones de inicialización y salida implementadas en el módulo.
+
+<div align="center">
+  <img src="img/Cap2.png"><br>
+  <em>Figura 2: Verificación de la correcta carga del módulo `tp_driver` en el kernel Linux.</em>
+</div>
+
+**Verificación mediante dmesg**
+
+Los mensajes generados por el módulo fueron verificados mediante el comando:
+
+```
+sudo dmesg | tail
+```
+
+A través de este mecanismo fue posible observar los mensajes emitidos por `printk()` durante la carga y descarga del módulo.
+
+Esto permitió confirmar la correcta ejecución de las funciones del módulo dentro del espacio de kernel.
+
+<div align="center">
+  <img src="img/Cap3.png"><br>
+  <em>Figura 3: Mensajes del kernel generados durante la carga y descarga del módulo.</em>
+</div>
+
 ## Conclusión general

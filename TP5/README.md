@@ -106,6 +106,26 @@ Esto permitió confirmar la correcta ejecución de las funciones del módulo den
   <em>Figura 3: Mensajes del kernel generados durante la carga y descarga del módulo.</em>
 </div>
 
+### Desarrollo de la Interfaz Web
+
+La capa de aplicación fue diseñada siguiendo una arquitectura que separa claramente la adquisición de datos de la lógica de visualización. El componente principal de esta capa es el archivo `app.py`, encargado de actuar como intermediario entre el driver de caracteres y la interfaz web. Su funcionamiento se divide en dos responsabilidades fundamentales:
+
+- *Adquisición de datos*: La adquisición de muestras se realiza mediante un hilo de ejecución secundario (`acquisition_loop`) que opera de forma independiente del servidor web. Este hilo efectúa lecturas periódicas sobre el dispositivo de caracteres (`/dev/gpio_driver`) utilizando operaciones no bloqueantes, con una frecuencia aproximada de 20 Hz.
+
+Las muestras obtenidas son almacenadas en memoria dentro de una estructura que funciona como un búfer circular de hasta 400 elementos. Esta estrategia permite conservar únicamente las mediciones más recientes, limitando el consumo de memoria y garantizando una actualización eficiente de los datos mostrados al usuario.
+
+- *Comunicación entre cliente y servidor*: Para permitir la interacción con la interfaz web se implementó una API REST sencilla compuesta por dos rutas principales:
+
+* **`/data`**: proporciona al navegador las últimas muestras adquiridas junto con la información de estado necesaria para la visualización. Los datos son serializados en formato JSON, facilitando su procesamiento mediante JavaScript en el lado del cliente.
+
+* **`/signal`**: recibe solicitudes HTTP de tipo POST generadas por el usuario cuando desea cambiar la señal monitoreada. La aplicación traduce estas solicitudes en operaciones de escritura sobre el dispositivo de caracteres, permitiendo que el controlador seleccione dinámicamente cuál de las entradas GPIO será utilizada para la adquisición de datos.
+
+**Visualización de las señales**
+
+El gráfico utiliza un eje temporal fijo que muestra una ventana con referencias temporales relativas que van desde **−3 s** hasta el instante actual, identificado como **"Ahora"**.
+
+La aplicación actualiza periódicamente el gráfico utilizando las muestras más recientes almacenadas en el búfer. De esta manera, la señal se desplaza de forma continua a lo largo de la pantalla, permitiendo observar su evolución en tiempo real sin necesidad de realizar desplazamientos manuales. Además, cuando el usuario selecciona una señal diferente, la visualización se reinicia automáticamente para evitar mezclar datos pertenecientes a distintas fuentes y garantizar una representación coherente de la nueva medición.
+
 ### Creación de un generador de señales para testing
 
 Con el objetivo de validar el correcto funcionamiento del controlador desarrollado y de la aplicación de visualización, se implementó un generador de señales utilizando una placa **Arduino UNO**. Este generador permite producir de forma controlada dos señales digitales periódicas independientes, las cuales son enviadas a los GPIO de la Raspberry Pi para su posterior adquisición por parte del driver.
@@ -148,7 +168,5 @@ El script `deploy.sh` se encarga de preparar el entorno de ejecución realizando
 Por otro lado, el script `undeploy.sh` realiza el proceso inverso, liberando todos los recursos utilizados por el sistema. Entre sus funciones se encuentran la descarga del módulo del kernel y la eliminación de las configuraciones aplicadas durante el despliegue.
 
 La utilización de estos scripts permitió reducir significativamente el tiempo necesario para iniciar y finalizar las pruebas, además de garantizar que todos los integrantes del grupo ejecutaran exactamente la misma secuencia de pasos. Esto mejoró la reproducibilidad de los ensayos, facilitó las tareas de depuración y minimizó errores humanos asociados a la configuración manual del sistema.
-
-## Resultados Obtenidos
 
 ## Conclusión general

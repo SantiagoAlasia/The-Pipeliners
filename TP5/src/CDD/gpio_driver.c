@@ -86,14 +86,14 @@ static ssize_t my_write(struct file *file, const char __user *buffer, size_t len
 /* OPEN */
 static int my_open(struct inode *inode, struct file *file)
 {
-    printk(KERN_INFO "gpio_driver: Dispositivo abierto\n");
+    //printk(KERN_INFO "gpio_driver: Dispositivo abierto\n");
     return 0;
 }
 
 /* RELEASE */
 static int my_release(struct inode *inode, struct file *file)
 {
-    printk(KERN_INFO "gpio_driver: Dispositivo cerrado\n");
+    //printk(KERN_INFO "gpio_driver: Dispositivo cerrado\n");
     return 0;
 }
 

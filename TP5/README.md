@@ -281,6 +281,12 @@ lsmod | grep gpio_driver
 ## Conclusión general
 ---
 
+El desarrollo e implementación de este sistema de adquisición permitió validar de manera práctica los conceptos de comunicación entre el **espacio de kernel** y el **espacio de usuario** bajo el sistema operativo Linux. Este diseño garantizó un acceso seguro, aislado y eficiente al hardware de la Raspberry Pi, evitando los riesgos de colisiones de memoria o bloqueos de pines comunes en las metodologías legadas.
+
+Asimismo, la integración de un servidor intermedio en Python junto con un frontend desacoplado en Chart.js permito observar las señales muestreadas. 
+
+En conclusión, el proyecto cumple con los objetivos de estabilidad, modularidad y rendimiento definidos al principio del trabajo.
+
 ## Bibliografia Consultada
 ---
 

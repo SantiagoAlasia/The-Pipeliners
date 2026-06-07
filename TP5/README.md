@@ -106,6 +106,32 @@ Esto permitió confirmar la correcta ejecución de las funciones del módulo den
   <em>Figura 3: Mensajes del kernel generados durante la carga y descarga del módulo.</em>
 </div>
 
+### Creación de un generador de señales para testing
+
+Con el objetivo de validar el correcto funcionamiento del controlador desarrollado y de la aplicación de visualización, se implementó un generador de señales utilizando una placa **Arduino UNO**. Este generador permite producir de forma controlada dos señales digitales periódicas independientes, las cuales son enviadas a los GPIO de la Raspberry Pi para su posterior adquisición por parte del driver.
+
+La utilización de un generador dedicado resultó especialmente útil durante las etapas de desarrollo y depuración, ya que permitió disponer de señales conocidas y repetibles, facilitando la verificación del comportamiento del sistema ante distintos patrones de entrada.
+
+El programa desarrollado para el Arduino genera dos señales digitales periódicas a través de dos pines de salida distintos. Ambas señales poseen un período de un segundo, cumpliendo con los requisitos establecidos en el enunciado del trabajo práctico. Sin embargo, cada una presenta una forma de onda diferente, lo que permite comprobar que el sistema es capaz de distinguir correctamente entre ambas señales y actualizar la visualización cuando el usuario selecciona una u otra.
+
+La forma temporal de las señales generadas se muestra a continuación:
+
+#### Señal 1
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura X. Forma de onda correspondiente a la Señal 1.*</em>
+</div>
+
+#### Señal 2
+
+<div align="center">
+  <img src=""><br>
+  <em>*Figura Y. Forma de onda correspondiente a la Señal 2.*</em>
+</div>
+
+Gracias a este banco de pruebas fue posible verificar el funcionamiento integral del sistema, desde la captura de datos en los GPIO, pasando por la comunicación entre el espacio de kernel y el espacio de usuario, hasta la correcta representación gráfica de las señales en la interfaz web.
+
 ### Automatización del proceso de carga y descarga del sistema completo
 
 Durante la etapa de desarrollo y pruebas fue necesario cargar y descargar repetidamente todos los componentes del sistema, incluyendo el Device Tree Overlay, el módulo del kernel y la aplicación de usuario. Con el objetivo de simplificar este procedimiento, se desarrollaron dos scripts en Bash que automatizan completamente el despliegue y la desinstalación del sistema: `deploy.sh` y `undeploy.sh`.
@@ -122,5 +148,7 @@ El script `deploy.sh` se encarga de preparar el entorno de ejecución realizando
 Por otro lado, el script `undeploy.sh` realiza el proceso inverso, liberando todos los recursos utilizados por el sistema. Entre sus funciones se encuentran la descarga del módulo del kernel y la eliminación de las configuraciones aplicadas durante el despliegue.
 
 La utilización de estos scripts permitió reducir significativamente el tiempo necesario para iniciar y finalizar las pruebas, además de garantizar que todos los integrantes del grupo ejecutaran exactamente la misma secuencia de pasos. Esto mejoró la reproducibilidad de los ensayos, facilitó las tareas de depuración y minimizó errores humanos asociados a la configuración manual del sistema.
+
+## Resultados Obtenidos
 
 ## Conclusión general

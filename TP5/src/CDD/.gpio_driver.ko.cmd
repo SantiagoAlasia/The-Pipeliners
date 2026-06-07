@@ -1,0 +1,1 @@
+savedcmd_gpio_driver.ko := aarch64-linux-gnu-ld -r -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T /home/santiagoalasia/linux-rpi618/scripts/module.lds -o gpio_driver.ko gpio_driver.o gpio_driver.mod.o .module-common.o

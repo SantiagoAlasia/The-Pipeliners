@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	fragment@0 {
+        target-path = "/";
+        __overlay__ {
+            my_dev_label: my_device {
+                compatible = "the-pipeliners,gpio-driver";
+                status = "okay";     
+                sensor1-gpios = <&gpio 21 0>; // Pin 23 activo alto
+                sensor2-gpios = <&gpio 20 0>; // Pin 24 activo alto
+            };
+        };
+    };
+};
